@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>文案粗剪 · 动画教程</title>
+<style>
+:root { --bg:#0b1020; --panel:#121a33; --line:#24305a; --text:#e8ecff; --dim:#8a94c0; --blue:#3b6cff; --cyan:#22d3ee; --ok:#22c55e; --warn:#f59e0b; --jy:#14161c; --jy2:#1d2029; --jyline:#2c303b; }
+* { box-sizing:border-box; margin:0; padding:0; }
+body { font-family:'Microsoft YaHei','PingFang SC',sans-serif; background:radial-gradient(1200px 600px at 70% -10%, #1d2b66 0%, var(--bg) 60%); color:var(--text); min-height:100vh; display:flex; flex-direction:column; align-items:center; padding:28px 20px; }
+h1 { font-size:26px; letter-spacing:1px; } h1 span { background:linear-gradient(90deg,var(--cyan),var(--blue)); -webkit-background-clip:text; color:transparent; }
+.sub { color:var(--dim); margin:8px 0 22px; font-size:14px; }
+.wrap { display:flex; gap:22px; width:min(1200px,100%); }
+.steps { width:260px; flex-shrink:0; background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:14px; height:fit-content; }
+.grpT { font-size:12px; color:var(--warn); padding:8px 10px 4px; letter-spacing:1px; }
+.step { display:flex; gap:10px; align-items:flex-start; padding:9px 10px; border-radius:10px; cursor:pointer; color:var(--dim); transition:.25s; font-size:14px; line-height:1.4; }
+.step .no { width:26px; height:26px; border-radius:50%; border:2px solid var(--line); display:flex; align-items:center; justify-content:center; font-size:13px; flex-shrink:0; transition:.25s; }
+.step.active { background:rgba(59,108,255,.15); color:var(--text); }
+.step.active .no { border-color:var(--blue); background:var(--blue); color:#fff; box-shadow:0 0 14px var(--blue); }
+.step.done .no { border-color:var(--ok); background:var(--ok); color:#fff; } .step.done { color:#b7c0e6; }
+.stage { flex:1; min-width:0; }
+.win { border-radius:14px; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,.45); border:1px solid #2b376b; position:relative; background:#0d1117; }
+.bar { background:#1b1f27; padding:9px 14px; display:flex; align-items:center; gap:10px; color:#9aa3b8; font-size:13px; }
+.dots i { display:inline-block; width:11px; height:11px; border-radius:50%; margin-right:6px; }
+.dots i:nth-child(1){background:#ff5f57}.dots i:nth-child(2){background:#febc2e}.dots i:nth-child(3){background:#28c840}
+.page { height:490px; position:relative; overflow:hidden; font-size:13px; }
+.page > .scene { position:absolute; inset:0; animation:fadeIn .45s ease; }
+@keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+#cursor { position:absolute; left:60%; top:75%; width:22px; height:22px; z-index:50; pointer-events:none; transition:left .9s cubic-bezier(.6,.05,.3,1), top .9s cubic-bezier(.6,.05,.3,1); filter:drop-shadow(0 2px 3px rgba(0,0,0,.5)); }
+.ripple { position:absolute; width:14px; height:14px; border-radius:50%; border:3px solid var(--cyan); z-index:49; pointer-events:none; animation:rip .6s ease-out forwards; }
+@keyframes rip { from { transform:translate(-50%,-50%) scale(.4); opacity:1; } to { transform:translate(-50%,-50%) scale(3.2); opacity:0; } }
+.pressed { transform:scale(.94); filter:brightness(.9); } .glow { box-shadow:0 0 0 2px rgba(34,211,238,.7), 0 0 20px rgba(34,211,238,.6) !important; }
+.caption { margin-top:16px; background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:14px 18px; min-height:78px; font-size:15px; line-height:1.7; }
+.caption .tag { display:inline-block; background:var(--blue); color:#fff; border-radius:6px; padding:0 8px; font-size:12px; margin-right:8px; }
+.caption code { background:#0b1230; color:var(--cyan); padding:1px 6px; border-radius:5px; font-family:Consolas,monospace; font-size:13px; }
+.caption .warn { color:var(--warn); }
+.ctrl { margin-top:14px; display:flex; gap:10px; align-items:center; }
+.ctrl button { background:var(--panel); color:var(--text); border:1px solid var(--line); border-radius:9px; padding:8px 16px; cursor:pointer; font-size:14px; font-family:inherit; }
+.ctrl button:hover { border-color:var(--blue); } .ctrl button.pri { background:var(--blue); border-color:var(--blue); }
+.prog { flex:1; height:6px; background:var(--line); border-radius:3px; overflow:hidden; } .prog i { display:block; height:100%; width:0; background:linear-gradient(90deg,var(--cyan),var(--blue)); transition:width .5s; }
+.tips { width:min(1200px,100%); margin-top:22px; display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
+.tip { background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:14px 16px; font-size:13px; line-height:1.7; color:#c3cbef; } .tip b { color:var(--warn); display:block; margin-bottom:4px; font-size:14px; }
+/* 剪映 */
+.jy { position:absolute; inset:0; background:var(--jy); color:#d6d9e0; }
+.jyTop { height:38px; background:var(--jy2); border-bottom:1px solid var(--jyline); display:flex; align-items:center; gap:4px; padding:0 10px; }
+.jyTab { padding:6px 12px; border-radius:6px; color:#aab0bd; } .jyTab.on { background:#2a2e39; color:#fff; }
+.jyLib { position:absolute; left:0; top:38px; width:260px; height:230px; border-right:1px solid var(--jyline); padding:12px; }
+.thumb { width:110px; height:64px; border-radius:6px; background:linear-gradient(135deg,#3b2f5c,#1f4b6e); position:relative; display:inline-block; } .thumb span { position:absolute; left:6px; bottom:4px; font-size:11px; color:#fff; }
+.jyPrev { position:absolute; left:260px; right:0; top:38px; height:230px; display:flex; align-items:center; justify-content:center; }
+.screen { width:300px; height:170px; background:linear-gradient(160deg,#2c3a55,#0f1420); border-radius:4px; position:relative; display:flex; align-items:flex-end; justify-content:center; padding-bottom:10px; color:#fff; font-size:14px; }
+.jyTool { position:absolute; left:0; right:0; top:268px; height:34px; background:var(--jy2); border-top:1px solid var(--jyline); border-bottom:1px solid var(--jyline); display:flex; align-items:center; gap:14px; padding:0 14px; color:#aab0bd; } .jyTool span { padding:4px 8px; border-radius:5px; }
+.tl { position:absolute; left:0; right:0; top:302px; bottom:0; padding:14px 14px 0 70px; }
+.tlLabel { position:absolute; left:12px; font-size:11px; color:#7c8394; }
+.track { height:30px; border-radius:4px; margin-bottom:10px; display:flex; overflow:hidden; } .track.v { background:#24506b; } .track.sub { height:20px; } .track.au { height:22px; }
+.seg { height:100%; border-right:2px solid var(--jy); background:linear-gradient(180deg,#2e6e8e,#1e4f68); animation:fadeIn .25s; }
+.sbox { height:100%; background:#8a5cf6; border-right:2px solid var(--jy); border-radius:3px; animation:fadeIn .25s; }
+.jyBtn { background:#00c8d6; color:#05252a; border-radius:6px; padding:7px 16px; font-weight:bold; display:inline-block; }
+/* 软件 */
+.app { position:absolute; inset:0; background:#0a0e14; color:#e6edf3; display:flex; }
+.appSide { width:150px; background:#0d1117; border-right:1px solid #30363d; padding:10px 0; flex-shrink:0; }
+.appSide div { padding:9px 16px; color:#c9d1d9; font-size:13px; border-left:3px solid transparent; }
+.appSide div.on { background:linear-gradient(90deg,rgba(31,111,235,.2),transparent); border-left-color:#1f6feb; color:#58a6ff; }
+.appMain { flex:1; padding:14px 20px; overflow:hidden; }
+.sec { font-weight:bold; margin:4px 0 8px; font-size:14px; }
+.fld { background:#21262d; border:1px solid #30363d; border-radius:6px; padding:7px 10px; color:#e6edf3; min-height:32px; font-size:13px; } .fld:empty::before { content:attr(data-ph); color:#6e7681; }
+.abtn { display:inline-block; background:#21262d; border:1px solid #30363d; color:#e6edf3; border-radius:6px; padding:6px 14px; } .abtn.pri { background:#1f6feb; border-color:#1f6feb; color:#fff; font-weight:bold; }
+.dcard { display:inline-block; width:118px; background:#161b22; border:2px solid #30363d; border-radius:6px; padding:8px; margin-right:8px; text-align:center; } .dcard.sel { border-color:#1f6feb; background:rgba(31,111,235,.15); }
+.log { background:#161b22; border:1px solid #30363d; border-radius:6px; height:220px; padding:10px 12px; font-family:Consolas,'Microsoft YaHei',monospace; font-size:12px; line-height:1.7; color:#9da7b3; overflow:hidden; } .log .ok { color:#3fb950; }
+.pbar { height:16px; background:#21262d; border-radius:8px; overflow:hidden; border:1px solid #30363d; margin:10px 0; } .pbar i { display:block; height:100%; width:0; background:#1f6feb; transition:width .6s; }
+.toast { position:absolute; left:50%; top:54px; transform:translateX(-50%); background:#16a34a; color:#fff; padding:8px 18px; border-radius:8px; font-size:14px; z-index:20; animation:fadeIn .3s; }
+.ta { background:#21262d; border:1px solid #30363d; border-radius:8px; padding:10px 12px; height:120px; font-size:13px; line-height:1.65; color:#e6edf3; overflow:hidden; white-space:pre-line; }
+.ta:empty::before { content:attr(data-ph); color:#6e7681; }
+.match { display:flex; gap:10px; align-items:center; margin-bottom:7px; animation:fadeIn .3s; } .match .t { flex:1; } .match .s { width:70px; height:38px; border-radius:4px; background:linear-gradient(135deg,#2e6e8e,#3b2f5c); color:#fff; font-size:11px; display:flex; align-items:center; justify-content:center; flex:none; }
+</style>
+</head>
+<body>
+<a href="index.html" style="position:fixed;left:18px;top:14px;color:#8a94c0;font-size:13px;text-decoration:none;border:1px solid #24305a;border-radius:8px;padding:5px 12px;background:#121a33;z-index:99">← 教程首页</a>
+<h1>✂️ <span>文案粗剪</span> 动画教程</h1>
+<div class="sub">你的解说文案 + 原片 → AI 给每句话配画面 → 剪映草稿　｜　自动播放，点左侧步骤可跳转</div>
+<div class="wrap">
+  <div class="steps" id="steps"></div>
+  <div class="stage">
+    <div class="win">
+      <div class="bar"><div class="dots"><i></i><i></i><i></i></div><span id="wtitle"></span></div>
+      <div class="page" id="page"></div>
+      <svg id="cursor" viewBox="0 0 24 24"><path d="M3 2l7 19 2.6-7.4L20 11z" fill="#fff" stroke="#111" stroke-width="1.6" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="caption" id="caption"></div>
+    <div class="ctrl"><button id="prev">⏮ 上一步</button><button id="play" class="pri">⏸ 暂停</button><button id="next">下一步 ⏭</button><button id="replay">🔁 重播本步</button><div class="prog"><i id="bar"></i></div></div>
+  </div>
+</div>
+<div class="tips">
+  <div class="tip"><b>🆚 和智能解说的区别</b>文案粗剪：<b>文案你自己写好</b>，AI 只负责配画面。智能解说：文案也让 AI 写。</div>
+  <div class="tip"><b>📝 文案格式</b>一行一句，每行就是一条字幕 + 一段配音。句子短一点（15 字左右）画面切得更灵活。</div>
+  <div class="tip"><b>⚡ 换文案秒出</b>同一部片子 + 同一个时间线草稿，打过一次标就有缓存。换一篇文案再跑，跳过打标直接匹配。</div>
+  <div class="tip"><b>🎲 生成多个版本</b>「生成数量」填 3，会出 3 个入点、镜头各不同的草稿，不额外花打标和配音费用，适合多账号发布。</div>
+</div>
+<script>
+const JY = (tool) => `<div class="jy">
+  <div class="jyTop"><span class="jyTab on">媒体</span><span class="jyTab">音频</span><span class="jyTab">文本</span><span class="jyTab">贴纸</span><span class="jyTab">特效</span><span style="margin-left:auto;color:#7c8394">剪映专业版</span></div>
+  <div class="jyLib"><div class="thumb" id="clip"><span>原片.mp4</span></div></div>
+  <div class="jyPrev"><div class="screen" id="screen">原片预览</div></div>
+  <div class="jyTool">${tool || '<span>↶</span><span>↷</span><span>✂ 分割</span><span>🗑</span>'}</div>
+  <div class="tl"><div class="tlLabel" style="top:20px">视频</div><div class="track v" id="vt" style="width:0"></div></div></div>`;
+const SIDE = `<div class="appSide"><div>🎯 智能匹配</div><div class="on" id="navNrc">✂️ 文案粗剪</div><div>🎙️ 智能解说</div><div>⚡ 智能快剪</div><div>🧹 去重</div><div>⚙️ 软件设置</div></div>`;
+const LINES = ['女人用力把一只绦虫从身体里拔出来','绦虫虽然看起来让人感到害怕','但是它对于模特来说可是减肥神器','她为了上封面已经三天没吃饭了','可经纪人却说她还不够瘦','就在这时，一个陌生男人找上了门'];
+
+const SCENES = [
+{ grp:'第一部分 · 剪映里准备', title:'导入原片 + 智能分割', win:'剪映专业版 · 新建草稿',
+  html: JY('<span>↶</span><span>↷</span><span>✂ 分割</span><span>🗑</span><span id="smart" style="background:#2a2e39;color:#00c8d6">🪄 智能分割</span>'),
+  acts:[{s:'剪映新建草稿，导入原片拖到时间线，然后做 <b>智能分割</b>（按镜头自动切开）。软件按这些镜头逐个看画面、配画面。<span class="warn">（按钮位置以你的剪映版本为准）</span>'},
+        {c:'#clip',f:()=>{const v=document.querySelector('#vt'); v.style.transition='width .8s'; v.style.width='100%';}},{w:800},
+        {c:'#smart',f:()=>{const v=document.querySelector('#vt'); v.innerHTML=''; let k=0; const t=setInterval(()=>{ v.insertAdjacentHTML('beforeend',`<div class="seg" style="width:${(2+Math.random()*4).toFixed(1)}%;flex:none"></div>`); if(++k>26) clearInterval(t); },60);}},{w:2000},
+        {s:'文案粗剪<b>不需要识别字幕</b>（文案是你自己的）。分割完关掉剪映，这个草稿就是软件里的「时间线草稿」。'},{w:1500}] },
+
+{ grp:'第二部分 · 软件里生成', title:'粘贴解说文案', win:'军哥团队智能匹配软件 · 文案粗剪',
+  html:`<div class="app">${SIDE}<div class="appMain">
+    <div class="sec">① 解说文案</div><div style="color:#7d8590;font-size:12px;margin-bottom:6px">直接粘贴文案（一行一句），或 <span class="abtn" style="padding:2px 8px">📂 从文件导入</span></div>
+    <div class="ta" id="ta" data-ph="在此粘贴解说文案，一行一句..."></div><div style="color:#7d8590;font-size:12px;margin-top:6px" id="cnt">0 句</div>
+  </div></div>`,
+  acts:[{s:'软件左侧点 <b>✂️ 文案粗剪</b>，在 <b>① 解说文案</b> 里粘贴你的文案：<b>一行一句</b>，每一行会变成一条字幕 + 一段配音 + 一段画面。'},{c:'#navNrc'},{c:'#ta',f:typeLines},{w:2600}] },
+
+{ title:'选原片 + 设置 + 配音', win:'军哥团队智能匹配软件 · 文案粗剪',
+  html:`<div class="app">${SIDE}<div class="appMain">
+    <div class="sec">② 原片视频</div><div style="display:flex;gap:8px;margin-bottom:14px"><div class="fld" id="vpath" style="flex:1" data-ph="点击选择原始电影/视频文件..."></div><span class="abtn" id="pick">📂 选择</span></div>
+    <div class="sec">③ 设置</div>
+    <div style="display:flex;gap:18px;flex-wrap:wrap;margin-bottom:12px">
+      <div><div style="color:#7d8590;font-size:12px;margin-bottom:4px">最小场景时长</div><span class="fld" style="display:inline-block;width:60px">0.5</span> <span style="color:#7d8590;font-size:12px">秒以下不剪入</span></div>
+      <div><div style="color:#7d8590;font-size:12px;margin-bottom:4px">生成数量</div><span class="fld" id="vn" style="display:inline-block;width:60px">1</span> <span style="color:#7d8590;font-size:12px">个差异化视频</span></div>
+      <div><div style="color:#7d8590;font-size:12px;margin-bottom:4px">输出草稿名称</div><span class="fld" style="display:inline-block;width:160px">文案粗剪结果</span></div></div>
+    <div style="color:#7d8590;font-size:12px;margin-bottom:4px">配音</div>
+    <div style="display:flex;gap:10px"><span class="fld" style="width:240px">🎵 IndexTTS 1.5 (本地克隆)</span><span class="fld" id="voice" style="width:180px" data-ph="选择音色"></span></div>
+    <div style="color:#7d8590;font-size:12px;margin-top:6px">已经有配好的整段 MP3？配音选「📂 自定义音频」，软件按停顿自动切成每句</div>
+  </div></div>`,
+  acts:[{s:'<b>② 原片视频</b> 点「选择」，选<b>同一个原片</b>。<b>③ 设置</b> 一般默认就行；想多出几个不同版本，把「生成数量」改大。'},
+        {c:'#pick',f:()=>{document.querySelector('#vpath').textContent='E:\\电影素材\\惊魂模特.mp4';}},{c:'#vn',f:()=>{document.querySelector('#vn').textContent='3';}},
+        {s:'选配音引擎和音色。<span class="warn">已经有自己录好的整段配音，配音选「📂 自定义音频」上传 MP3 就行。</span>'},{c:'#voice',f:()=>{document.querySelector('#voice').textContent='大班班.pt';}},{w:1200}] },
+
+{ title:'模型 Key + 选时间线草稿', win:'军哥团队智能匹配软件 · 文案粗剪',
+  html:`<div class="app">${SIDE}<div class="appMain">
+    <div class="sec">③B 打标模型配置</div>
+    <div style="display:grid;grid-template-columns:80px 1fr;gap:8px;align-items:center;margin-bottom:14px">
+      <span style="color:#7d8590">API Key</span><div class="fld" id="key" data-ph="火山方舟 API Key（留空用软件设置里的）"></div>
+      <span style="color:#7d8590">模型</span><div class="fld">doubao-seed-2-1-lite-260915（打标）</div></div>
+    <div class="sec">③C 缓存管理 <span style="color:#6ee7b7;font-weight:normal;font-size:12px">　同一电影+同一时间线自动缓存，换文案跳过打标</span></div>
+    <div class="sec" style="margin-top:14px">时间线草稿 <span style="color:#7d8590;font-weight:normal;font-size:12px">　选择已做"智能分隔"的草稿</span></div>
+    <div><span class="dcard"><b>11月10日</b><div style="color:#7d8590;font-size:11px">12 段</div></span><span class="dcard" id="d1"><b>惊魂模特</b><div style="color:#7d8590;font-size:11px">812 段</div></span><span class="dcard"><b>11月11日</b><div style="color:#7d8590;font-size:11px">1 段</div></span></div>
+  </div></div>`,
+  acts:[{s:'<b>③B</b> 填火山方舟的豆包 API Key（只填一次，会记住；不会申请看<a href="doubao.html" style="color:#22d3ee">《豆包模型申请教程》</a>）。'},{c:'#key',f:()=>{document.querySelector('#key').textContent='ark-••••••••-••••-••••-••••-••••••••';}},
+        {s:'最下面的 <b>时间线草稿</b> 里点刚才智能分割过的草稿。<span class="warn">段数很少（1 段）的草稿就是没分割过的，别选。</span>'},{c:'#d1',f:()=>{document.querySelector('#d1').classList.add('sel');}},{w:1200}] },
+
+{ title:'开始粗剪：AI 逐句配画面', win:'军哥团队智能匹配软件 · 运行中',
+  html:`<div class="app">${SIDE}<div class="appMain" style="display:flex;gap:16px">
+    <div style="flex:1"><span class="abtn pri" id="start" style="padding:10px 26px;font-size:14px">🚀 开始文案粗剪</span><div class="pbar"><i id="pb"></i></div><div class="log" id="log"></div></div>
+    <div style="width:300px"><div class="sec">AI 匹配结果（示意）</div><div id="mt"></div></div>
+  </div></div>`,
+  acts:[{s:'点 <b>🚀 开始文案粗剪</b>。软件会：压缩原片并给每个镜头打上编号 → 豆包看画面打标 → <b>逐句挑最贴合的镜头</b> → 配音 → 生成草稿。'},{c:'#start',f:runLog},{w:7000},
+        {s:'第一次打标要几分钟；<b>同一部片子换文案再跑会命中缓存</b>，几十秒就出结果。'},{w:1500}] },
+
+{ grp:'第三部分 · 看成品', title:'打开剪映草稿', win:'剪映专业版 · 草稿「文案粗剪结果」',
+  html:`<div class="jy">
+    <div class="jyTop"><span class="jyTab on">媒体</span><span class="jyTab">音频</span><span class="jyTab">文本</span><span style="margin-left:auto"><span class="jyBtn" id="export">导出</span></span></div>
+    <div class="jyPrev" style="left:0"><div class="screen" id="scr" style="width:340px;height:190px"></div></div>
+    <div class="jyTool"><span>↶</span><span>↷</span><span>✂ 分割</span></div>
+    <div class="tl" style="padding-top:8px">
+      <div class="tlLabel" style="top:14px">字幕</div><div class="track sub" id="r1"></div>
+      <div class="tlLabel" style="top:46px">画面</div><div class="track v" id="r2" style="background:none"></div>
+      <div class="tlLabel" style="top:86px">配音</div><div class="track au" id="r3"></div></div></div>`,
+  acts:[{f:buildResult},{s:'剪映里打开 <b>文案粗剪结果</b>（生成数量填 3 就有 3 个草稿）。字幕、画面、配音一句一句对齐好了。'},{w:1800},
+        {s:'个别句子画面不满意，可以用软件里的 <b>AI智能重选</b> 或手动换；没问题就 <b>导出</b>。🎉'},{c:'#export',f:()=>toast('✅ 导出中...')},{w:1500}] },
+];
+
+function toast(msg){ const p=document.querySelector('#page'); const t=document.createElement('div'); t.className='toast'; t.textContent=msg; p.appendChild(t); setTimeout(()=>t.remove(),1600); }
+function typeLines(){ const ta=document.querySelector('#ta'), cnt=document.querySelector('#cnt'); let i=0;
+  const t=setInterval(()=>{ if(!document.body.contains(ta)) return clearInterval(t); ta.textContent+=(i?'\n':'')+LINES[i]; cnt.textContent=(i+1)+' 句'; if(++i>=LINES.length) clearInterval(t); },380); }
+function runLog(){
+  const L=['[文案粗剪] 文案 6 句，原片 96.4 分钟','[时间线] 812 个镜头（最小 0.5 秒）','[压缩] 压缩并烧录场景ID角标（AI 照着编号认镜头）','[打标] 20 段并发打标，模型 doubao-seed-2-1-lite','[打标] 完成：812/812 个镜头有描述，已缓存','[匹配] 逐句挑选画面（doubao-seed-2-1-turbo）...','[匹配] 完成：6/6 句','[配音] 6/6 句','[草稿] 生成 3 个差异化版本','<span class="ok">✅ 文案粗剪完成：文案粗剪结果 / _2 / _3</span>'];
+  const log=document.querySelector('#log'), pb=document.querySelector('#pb'), mt=document.querySelector('#mt'); let i=0;
+  const t=setInterval(()=>{ if(!document.body.contains(log)) return clearInterval(t); log.insertAdjacentHTML('beforeend',L[i]+'<br>'); pb.style.width=((i+1)/L.length*100)+'%';
+    if(i===6) LINES.forEach((l,k)=>setTimeout(()=>{ if(document.body.contains(mt)) mt.insertAdjacentHTML('beforeend',`<div class="match"><div class="s">S${String(120+k*37).padStart(3,'0')}</div><div class="t">${l}</div></div>`); },k*120));
+    if(++i>=L.length) clearInterval(t); },560); }
+function buildResult(){
+  const r1=document.querySelector('#r1'), r2=document.querySelector('#r2'), r3=document.querySelector('#r3');
+  LINES.forEach(l=>{ const w=(l.length*0.95).toFixed(1); r1.insertAdjacentHTML('beforeend',`<div class="sbox" style="width:${w}%;flex:none"></div>`);
+    r3.insertAdjacentHTML('beforeend',`<div style="width:${w}%;flex:none;background:#16a34a;border-right:2px solid #14161c;border-radius:3px"></div>`);
+    const a=(w*0.55).toFixed(1); r2.insertAdjacentHTML('beforeend',`<div class="seg" style="width:${a}%;flex:none"></div><div class="seg" style="width:${(w-a).toFixed(1)}%;flex:none"></div>`); });
+  let k=0; const s=document.querySelector('#scr'); s.textContent=LINES[0];
+  const t=setInterval(()=>{ if(!document.body.contains(s)) return clearInterval(t); s.textContent=LINES[++k%LINES.length]; },1200); }
+
+// ===== 播放引擎 =====
+const page=document.querySelector('#page'), cursor=document.querySelector('#cursor'), cap=document.querySelector('#caption'), wt=document.querySelector('#wtitle'), stepsEl=document.querySelector('#steps'), bar=document.querySelector('#bar');
+let cur=0, paused=false, token=0;
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+async function waitPlay(tk){ while(paused){ await sleep(100); if(tk!==token) throw 0; } if(tk!==token) throw 0; }
+function center(el){ const b=document.querySelector('.win').getBoundingClientRect(), r=el.getBoundingClientRect(); return [r.left-b.left+r.width/2, r.top-b.top+r.height/2]; }
+async function moveTo(el,tk){ const [x,y]=center(el); cursor.style.left=(x-4)+'px'; cursor.style.top=(y-2)+'px'; await sleep(950); await waitPlay(tk); }
+async function click(el,tk){ el.classList.add('glow'); await moveTo(el,tk); const [x,y]=center(el); const r=document.createElement('div'); r.className='ripple'; r.style.left=x+'px'; r.style.top=y+'px'; document.querySelector('.win').appendChild(r); setTimeout(()=>r.remove(),650);
+  el.classList.add('pressed'); await sleep(180); el.classList.remove('pressed','glow'); await sleep(250); }
+function renderSteps(){ stepsEl.innerHTML=SCENES.map((s,i)=>`${s.grp?`<div class="grpT">${s.grp}</div>`:''}<div class="step ${i===cur?'active':i<cur?'done':''}" data-i="${i}"><div class="no">${i<cur?'✓':i+1}</div><div>${s.title}</div></div>`).join('');
+  stepsEl.querySelectorAll('.step').forEach(e=>e.onclick=()=>go(+e.dataset.i)); bar.style.width=((cur+1)/SCENES.length*100)+'%'; }
+async function runScene(i){ const tk=++token; cur=i; renderSteps(); const s=SCENES[i]; wt.textContent=s.win; page.innerHTML=`<div class="scene">${s.html}</div>`;
+  cap.innerHTML=`<span class="tag">第 ${i+1}/${SCENES.length} 步</span>`; cursor.style.left='60%'; cursor.style.top='75%';
+  try { await sleep(500); await waitPlay(tk);
+    for(const a of s.acts){
+      if(a.s) cap.innerHTML=`<span class="tag">第 ${i+1}/${SCENES.length} 步</span>${a.s}`;
+      if(a.w) await sleep(a.w);
+      if(a.c) await click(document.querySelector(a.c),tk);
+      if(a.f) a.f();
+      await waitPlay(tk);
+    }
+    await sleep(2400); await waitPlay(tk);
+    if(i<SCENES.length-1) runScene(i+1); else stepsEl.querySelectorAll('.step').forEach(e=>e.classList.add('done'));
+  } catch(e) { /* 被跳转打断 */ } }
+function go(i){ paused=false; document.querySelector('#play').textContent='⏸ 暂停'; runScene(Math.max(0,Math.min(SCENES.length-1,i))); }
+document.querySelector('#prev').onclick=()=>go(cur-1);
+document.querySelector('#next').onclick=()=>go(cur+1);
+document.querySelector('#replay').onclick=()=>go(cur);
+document.querySelector('#play').onclick=e=>{ paused=!paused; e.target.textContent=paused?'▶ 继续':'⏸ 暂停'; };
+runScene(0);
+</script>
+</body>
+</html>

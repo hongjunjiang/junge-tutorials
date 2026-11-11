@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>豆包大模型 API Key 申请教程（动画版）</title>
+<style>
+:root { --bg:#0b1020; --panel:#121a33; --line:#24305a; --text:#e8ecff; --dim:#8a94c0; --blue:#3b6cff; --cyan:#22d3ee; --ok:#22c55e; --warn:#f59e0b; }
+* { box-sizing:border-box; margin:0; padding:0; }
+body { font-family:'Microsoft YaHei','PingFang SC',sans-serif; background:radial-gradient(1200px 600px at 70% -10%, #1d2b66 0%, var(--bg) 60%); color:var(--text); min-height:100vh; display:flex; flex-direction:column; align-items:center; padding:28px 20px; }
+h1 { font-size:26px; letter-spacing:1px; }
+h1 span { background:linear-gradient(90deg,var(--cyan),var(--blue)); -webkit-background-clip:text; color:transparent; }
+.sub { color:var(--dim); margin:8px 0 22px; font-size:14px; }
+.wrap { display:flex; gap:22px; width:min(1180px,100%); }
+/* 左侧步骤 */
+.steps { width:250px; flex-shrink:0; background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:14px; height:fit-content; }
+.step { display:flex; gap:10px; align-items:flex-start; padding:10px; border-radius:10px; cursor:pointer; color:var(--dim); transition:.25s; font-size:14px; line-height:1.4; }
+.step .no { width:26px; height:26px; border-radius:50%; border:2px solid var(--line); display:flex; align-items:center; justify-content:center; font-size:13px; flex-shrink:0; transition:.25s; }
+.step.active { background:rgba(59,108,255,.15); color:var(--text); }
+.step.active .no { border-color:var(--blue); background:var(--blue); color:#fff; box-shadow:0 0 14px var(--blue); }
+.step.done .no { border-color:var(--ok); background:var(--ok); color:#fff; }
+.step.done { color:#b7c0e6; }
+/* 右侧浏览器 */
+.stage { flex:1; min-width:0; }
+.browser { background:#f5f7fb; border-radius:14px; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,.45); border:1px solid #2b376b; position:relative; }
+.bar { background:#e3e7f0; padding:10px 14px; display:flex; align-items:center; gap:10px; }
+.dots i { display:inline-block; width:11px; height:11px; border-radius:50%; margin-right:6px; }
+.dots i:nth-child(1){background:#ff5f57}.dots i:nth-child(2){background:#febc2e}.dots i:nth-child(3){background:#28c840}
+.url { flex:1; background:#fff; border-radius:8px; padding:6px 12px; font-size:13px; color:#3a4466; font-family:Consolas,monospace; white-space:nowrap; overflow:hidden; }
+.url b { color:#16a34a; font-weight:normal; }
+.page { height:470px; position:relative; color:#1e2340; overflow:hidden; }
+.page > .scene { position:absolute; inset:0; animation:fadeIn .45s ease; }
+@keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+/* 鼠标与点击效果 */
+#cursor { position:absolute; left:50%; top:60%; width:22px; height:22px; z-index:50; pointer-events:none; transition:left .9s cubic-bezier(.6,.05,.3,1), top .9s cubic-bezier(.6,.05,.3,1); filter:drop-shadow(0 2px 3px rgba(0,0,0,.35)); }
+.ripple { position:absolute; width:14px; height:14px; border-radius:50%; border:3px solid var(--blue); z-index:49; pointer-events:none; animation:rip .6s ease-out forwards; }
+@keyframes rip { from { transform:translate(-50%,-50%) scale(.4); opacity:1; } to { transform:translate(-50%,-50%) scale(3.2); opacity:0; } }
+.pressed { transform:scale(.94); filter:brightness(.92); }
+.glow { box-shadow:0 0 0 3px rgba(59,108,255,.55), 0 0 22px rgba(59,108,255,.6) !important; transition:box-shadow .3s; }
+/* 讲解字幕 + 控制 */
+.caption { margin-top:16px; background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:14px 18px; min-height:74px; font-size:15px; line-height:1.7; }
+.caption .tag { display:inline-block; background:var(--blue); color:#fff; border-radius:6px; padding:0 8px; font-size:12px; margin-right:8px; }
+.caption code { background:#0b1230; color:var(--cyan); padding:1px 6px; border-radius:5px; font-family:Consolas,monospace; font-size:13px; }
+.ctrl { margin-top:14px; display:flex; gap:10px; align-items:center; }
+.ctrl button { background:var(--panel); color:var(--text); border:1px solid var(--line); border-radius:9px; padding:8px 16px; cursor:pointer; font-size:14px; font-family:inherit; }
+.ctrl button:hover { border-color:var(--blue); }
+.ctrl button.pri { background:var(--blue); border-color:var(--blue); }
+.prog { flex:1; height:6px; background:var(--line); border-radius:3px; overflow:hidden; }
+.prog i { display:block; height:100%; width:0; background:linear-gradient(90deg,var(--cyan),var(--blue)); transition:width .5s; }
+.tips { width:min(1180px,100%); margin-top:22px; display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+.tip { background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:14px 16px; font-size:13px; line-height:1.7; color:#c3cbef; }
+.tip b { color:var(--warn); display:block; margin-bottom:4px; font-size:14px; }
+/* 模拟网页里的通用元素 */
+.top { height:54px; background:#fff; border-bottom:1px solid #e6e9f2; display:flex; align-items:center; padding:0 22px; gap:22px; font-size:14px; color:#4b5578; }
+.logo { font-weight:bold; color:#1f3fd6; font-size:17px; display:flex; align-items:center; gap:6px; }
+.logo i { width:20px; height:20px; border-radius:5px; background:linear-gradient(135deg,#3b6cff,#22d3ee); display:inline-block; }
+.btn { display:inline-block; background:#1f5eff; color:#fff; border-radius:7px; padding:8px 18px; font-size:14px; transition:.15s; }
+.btn.ghost { background:#fff; color:#1f5eff; border:1px solid #1f5eff; }
+.input { border:1px solid #cfd5e6; border-radius:7px; padding:10px 12px; font-size:14px; background:#fff; min-height:40px; color:#1e2340; font-family:Consolas,'Microsoft YaHei',monospace; }
+.input:empty::before { content:attr(data-ph); color:#a0a8c4; }
+.side { position:absolute; left:0; top:54px; bottom:0; width:190px; background:#fff; border-right:1px solid #e6e9f2; padding:12px 8px; font-size:13px; }
+.side div { padding:9px 12px; border-radius:6px; color:#4b5578; }
+.side div.on { background:#eef2ff; color:#1f5eff; font-weight:bold; }
+.side .grp { color:#9aa3c2; font-size:12px; padding:12px 12px 4px; }
+.main { position:absolute; left:190px; right:0; top:54px; bottom:0; padding:22px 26px; background:#f6f8fc; }
+.card { background:#fff; border:1px solid #e6e9f2; border-radius:10px; padding:16px 18px; }
+.row { display:flex; align-items:center; justify-content:space-between; padding:12px 4px; border-bottom:1px solid #eef0f6; font-size:14px; }
+.badge { font-size:12px; border-radius:5px; padding:2px 8px; background:#ecfdf3; color:#16a34a; }
+.badge.off { background:#f1f3f9; color:#8a93b2; }
+.modal { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:440px; background:#fff; border-radius:12px; box-shadow:0 16px 50px rgba(20,30,80,.25); padding:22px; z-index:10; animation:fadeIn .35s; }
+.mask { position:absolute; inset:0; background:rgba(15,20,45,.35); z-index:9; animation:fadeIn .3s; }
+.toast { position:absolute; left:50%; top:70px; transform:translateX(-50%); background:#16a34a; color:#fff; padding:8px 18px; border-radius:8px; font-size:14px; z-index:20; animation:fadeIn .3s; }
+</style>
+</head>
+<body>
+<a href="index.html" style="position:fixed;left:18px;top:14px;color:#8a94c0;font-size:13px;text-decoration:none;border:1px solid #24305a;border-radius:8px;padding:5px 12px;background:#121a33;z-index:99">← 教程首页</a>
+<h1>🫘 <span>豆包大模型 API Key</span> 申请教程</h1>
+<div class="sub">火山引擎 · 火山方舟　｜　自动播放，点左侧步骤可跳转　｜　申请后填进「智能解说 → ③B 模型配置」</div>
+<div class="wrap">
+  <div class="steps" id="steps"></div>
+  <div class="stage">
+    <div class="browser">
+      <div class="bar"><div class="dots"><i></i><i></i><i></i></div><div class="url" id="url"></div></div>
+      <div class="page" id="page"></div>
+      <svg id="cursor" viewBox="0 0 24 24"><path d="M3 2l7 19 2.6-7.4L20 11z" fill="#111" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="caption" id="caption"></div>
+    <div class="ctrl">
+      <button id="prev">⏮ 上一步</button>
+      <button id="play" class="pri">⏸ 暂停</button>
+      <button id="next">下一步 ⏭</button>
+      <button id="replay">🔁 重播本步</button>
+      <div class="prog"><i id="bar"></i></div>
+    </div>
+  </div>
+</div>
+<div class="tips">
+  <div class="tip"><b>💰 费用</b>新账号通常有免费额度（以控制台显示为准）。用完后在「费用中心」充值，按量计费。打标用 lite 便宜，写文案用 turbo。</div>
+  <div class="tip"><b>🔐 Key 要保密</b>API Key 等于账户的钱包钥匙，不要发到群里或截图外传。泄露了就到「API Key 管理」删掉，重新创建一个。</div>
+  <div class="tip"><b>❓ 报错排查</b>提示 401：Key 填错或已删除。提示模型不存在 / 未开通：回到「开通管理」开通对应模型。提示余额不足：去费用中心充值。</div>
+</div>
+<script>
+// ===== 场景定义：每步 = 地址栏 + 页面 HTML + 讲解 + 动作序列 =====
+// 动作：{c:选择器} 点击；{t:选择器, v:文字} 打字；{w:毫秒} 等待；{s:讲解} 换讲解；{f:函数} 改页面
+const CONSOLE_TOP = (title) => `<div class="top"><div class="logo"><i></i>火山引擎</div><span style="color:#1e2340;font-weight:bold">${title}</span><span style="margin-left:auto">费用中心</span><span>工单</span><span>👤 我的账号</span></div>`;
+const ARK_SIDE = (on) => `<div class="side">
+  <div class="grp">火山方舟</div><div ${on==='home'?'class="on"':''}>概览</div><div>体验中心</div>
+  <div class="grp">系统管理</div><div id="sOpen" ${on==='open'?'class="on"':''}>开通管理</div><div id="sKey" ${on==='key'?'class="on"':''}>API Key 管理</div>
+  <div class="grp">在线推理</div><div>推理接入点</div><div>用量统计</div></div>`;
+const MODELS = [['Doubao-Seed-2.1-lite','打标（看画面、记台词）','lite'],['Doubao-Seed-2.1-turbo','写文案 / 排片 / 规划','turbo']];
+
+const SCENES = [
+{ title:'打开火山引擎官网，注册账号', url:'https://<b>www.volcengine.com</b>/',
+  html:`<div class="top"><div class="logo"><i></i>火山引擎</div><span>产品</span><span>解决方案</span><span>定价</span><span>文档</span>
+    <span style="margin-left:auto" id="login">登录</span><span class="btn" id="reg">立即注册</span></div>
+    <div style="padding:70px 60px;background:linear-gradient(120deg,#eaf0ff,#f7fbff 60%)">
+      <div style="font-size:34px;font-weight:bold;color:#14205a">火山方舟 · 大模型服务平台</div>
+      <div style="margin:14px 0 26px;color:#5a648c;font-size:16px">豆包大模型 · 一站式调用 · 按量付费</div>
+      <span class="btn" style="padding:11px 26px">立即体验</span>
+    </div>`,
+  acts:[{s:'浏览器打开 <code>https://www.volcengine.com</code>（火山引擎官网）。已有抖音/字节系账号可以直接<b>登录</b>，没有就点右上角 <b>立即注册</b>。'},{w:900},{c:'#reg'}] },
+
+{ title:'手机号注册 / 登录', url:'https://<b>console.volcengine.com</b>/auth/signup',
+  html:`<div style="display:flex;height:100%;align-items:center;justify-content:center;background:#eef2fb">
+    <div class="card" style="width:380px;padding:26px">
+      <div style="font-size:20px;font-weight:bold;margin-bottom:18px">注册火山引擎账号</div>
+      <div class="input" id="phone" data-ph="请输入手机号"></div>
+      <div style="display:flex;gap:10px;margin:12px 0"><div class="input" id="code" style="flex:1" data-ph="短信验证码"></div><span class="btn ghost" id="getCode" style="padding:10px 12px">获取验证码</span></div>
+      <div style="font-size:13px;color:#5a648c;margin:6px 0 16px"><span id="agree" style="display:inline-block;width:15px;height:15px;border:1px solid #9aa3c2;border-radius:3px;vertical-align:-2px;margin-right:6px"></span>我已阅读并同意《服务协议》《隐私政策》</div>
+      <div class="btn" id="signup" style="display:block;text-align:center;padding:11px">注 册</div>
+    </div></div>`,
+  acts:[{s:'输入手机号，点 <b>获取验证码</b>，填入短信里的验证码，勾选协议后点 <b>注册</b>。'},{t:'#phone',v:'138 0013 8000'},{c:'#getCode'},{w:500},{t:'#code',v:'246810'},
+        {c:'#agree',f:()=>{const a=document.querySelector('#agree');a.style.background='#1f5eff';a.style.borderColor='#1f5eff';a.innerHTML='<span style="color:#fff;font-size:11px;position:relative;top:-3px;left:2px">✓</span>';}},{c:'#signup'}] },
+
+{ title:'实名认证（必须）', url:'https://<b>console.volcengine.com</b>/user/authentication',
+  html:CONSOLE_TOP('账号中心')+`<div style="padding:30px 40px">
+    <div style="font-size:18px;font-weight:bold;margin-bottom:6px">实名认证</div><div style="color:#7a84a8;font-size:13px;margin-bottom:20px">未实名的账号不能调用模型、不能创建 API Key</div>
+    <div style="display:flex;gap:18px">
+      <div class="card" id="personal" style="flex:1;cursor:pointer"><div style="font-size:16px;font-weight:bold">👤 个人实名认证</div><div style="color:#7a84a8;font-size:13px;margin:8px 0 14px">身份证 + 刷脸，约 1 分钟</div><span class="btn">立即认证</span></div>
+      <div class="card" style="flex:1;opacity:.7"><div style="font-size:16px;font-weight:bold">🏢 企业实名认证</div><div style="color:#7a84a8;font-size:13px;margin:8px 0 14px">营业执照 + 对公打款</div><span class="btn ghost">去认证</span></div>
+    </div>
+    <div id="form" style="display:none;margin-top:20px" class="card">
+      <div style="display:flex;gap:12px"><div class="input" id="name" style="flex:1" data-ph="真实姓名"></div><div class="input" id="idno" style="flex:2" data-ph="身份证号"></div><span class="btn" id="face">手机扫码刷脸</span></div>
+    </div></div>`,
+  acts:[{s:'登录后进入控制台，右上角头像 → <b>账号中心 → 实名认证</b>。个人用户选 <b>个人实名认证</b>，填姓名、身份证号，用手机扫码刷脸即可。'},{c:'#personal',f:()=>{document.querySelector('#form').style.display='block';}},
+        {t:'#name',v:'张*'},{t:'#idno',v:'4403**********1234'},{c:'#face',f:()=>toast('✅ 实名认证成功')},{w:900}] },
+
+{ title:'进入「火山方舟」控制台', url:'https://<b>console.volcengine.com</b>/',
+  html:CONSOLE_TOP('控制台')+`<div style="padding:28px 40px">
+    <div class="input" id="search" style="width:460px" data-ph="🔍 搜索云产品"></div>
+    <div id="result" style="display:none;width:460px;margin-top:6px" class="card"><div id="ark" style="padding:6px 4px;cursor:pointer"><b>火山方舟</b> <span style="color:#7a84a8;font-size:13px">　大模型服务平台（豆包）</span></div></div>
+    <div style="margin-top:26px;color:#7a84a8;font-size:13px">也可以直接访问：console.volcengine.com/ark</div></div>`,
+  acts:[{s:'在控制台顶部搜索 <b>火山方舟</b> 并进入（或直接打开 <code>console.volcengine.com/ark</code>）。豆包模型都在这里。'},{t:'#search',v:'火山方舟'},{f:()=>{document.querySelector('#result').style.display='block';}},{w:400},{c:'#ark'}] },
+
+{ title:'开通模型：lite + turbo', url:'https://<b>console.volcengine.com</b>/ark/region:cn-beijing/openManagement',
+  html:CONSOLE_TOP('火山方舟')+ARK_SIDE('open')+`<div class="main"><div style="font-size:17px;font-weight:bold;margin-bottom:12px">开通管理 · 语言模型</div><div class="card">
+    ${MODELS.map((m,i)=>`<div class="row"><div><b>${m[0]}</b><div style="color:#7a84a8;font-size:12px;margin-top:3px">软件里用于：${m[1]}</div></div><div><span class="badge off" id="bd${i}">未开通</span>　<span class="btn" id="op${i}" style="padding:6px 14px">开通服务</span></div></div>`).join('')}
+    <div class="row" style="border:none;color:#9aa3c2;font-size:12px">（模型版本号以控制台实际显示为准）</div></div></div>`,
+  acts:[{s:'左侧 <b>系统管理 → 开通管理</b>，找到 <b>Doubao-Seed-2.1-lite</b> 和 <b>Doubao-Seed-2.1-turbo</b>，分别点 <b>开通服务</b>。lite 负责看画面打标，turbo 负责写文案。'},{c:'#sOpen'},
+        {c:'#op0',f:()=>openModel(0)},{w:500},{c:'#op1',f:()=>openModel(1)},{w:900}] },
+
+{ title:'创建 API Key 并复制', url:'https://<b>console.volcengine.com</b>/ark/region:cn-beijing/apiKey',
+  html:CONSOLE_TOP('火山方舟')+ARK_SIDE('key')+`<div class="main"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div style="font-size:17px;font-weight:bold">API Key 管理</div><span class="btn" id="create">＋ 创建 API Key</span></div>
+    <div class="card" id="list"><div style="color:#9aa3c2;text-align:center;padding:30px">暂无 API Key</div></div></div>`,
+  acts:[{s:'左侧 <b>API Key 管理</b> → 点 <b>创建 API Key</b>，名字随便填（比如“智能解说”），确定后点 <b>复制</b>。'},{c:'#sKey'},{c:'#create',f:showKeyModal},{t:'#kname',v:'智能解说'},{c:'#kok',f:keyCreated},{w:600},{c:'#copy',f:()=>toast('✅ 已复制到剪贴板')},{w:900}] },
+
+{ title:'填进软件 ③B 模型配置', url:'军哥团队智能匹配软件 · 智能解说',
+  html:`<div style="height:100%;background:#0d1117;color:#e6edf3;padding:22px 30px;font-size:14px">
+    <div style="font-size:16px;font-weight:bold;margin-bottom:14px">③B 模型配置（打标 + 写文案）</div>
+    <div style="display:grid;grid-template-columns:110px 1fr;gap:12px;align-items:center">
+      <span style="color:#7d8590">API 地址</span><div class="input sw" id="aurl" data-ph="API URL" style="background:#21262d;border-color:#30363d;color:#e6edf3"></div>
+      <span style="color:#7d8590">API Key</span><div class="input sw" id="akey" data-ph="粘贴刚才复制的 Key" style="background:#21262d;border-color:#30363d;color:#e6edf3"></div>
+      <span style="color:#7d8590">打标模型</span><div class="input sw" id="m1" data-ph="打标模型" style="background:#21262d;border-color:#30363d;color:#e6edf3"></div>
+      <span style="color:#7d8590">写文案模型</span><div class="input sw" id="m2" data-ph="写文案模型" style="background:#21262d;border-color:#30363d;color:#e6edf3"></div>
+    </div>
+    <div style="margin-top:18px"><span class="btn" id="save">💾 保存配置</span>　<span class="btn ghost" id="test" style="background:transparent">🧪 测试连接</span></div></div>`,
+  acts:[{s:'回到软件「智能解说」页面的 <b>③B 模型配置</b>：地址填 <code>https://ark.cn-beijing.volces.com/api/v3</code>，粘贴 Key，模型保持默认（lite 打标、turbo 写文案），保存后点测试。'},
+        {t:'#aurl',v:'https://ark.cn-beijing.volces.com/api/v3'},{t:'#akey',v:'ark-••••••••-••••-••••-••••-••••••••',fast:true},
+        {t:'#m1',v:'doubao-seed-2-1-lite-260915',fast:true},{t:'#m2',v:'doubao-seed-2-1-turbo-260628',fast:true},{c:'#save',f:()=>toast('✅ 已保存')},{w:600},{c:'#test',f:()=>toast('✅ 连接成功，可以开始使用')},{w:1200},
+        {s:'🎉 完成！以后「智能解说」「弹幕解说」「智能快剪」都会用这个 Key。用量和余额在火山方舟的 <b>用量统计</b> / <b>费用中心</b> 查看。'}] },
+];
+
+// ===== 页面里的小动作 =====
+function toast(msg){ const p=document.querySelector('#page'); const t=document.createElement('div'); t.className='toast'; t.textContent=msg; p.appendChild(t); setTimeout(()=>t.remove(),1600); }
+function openModel(i){ const b=document.querySelector('#bd'+i); b.className='badge'; b.textContent='已开通'; const o=document.querySelector('#op'+i); o.className='btn ghost'; o.textContent='已开通'; toast(`✅ ${MODELS[i][0]} 开通成功`); }
+function showKeyModal(){ const p=document.querySelector('#page'); p.insertAdjacentHTML('beforeend',`<div class="mask" id="mask"></div><div class="modal" id="modal"><div style="font-size:17px;font-weight:bold;margin-bottom:14px">创建 API Key</div><div class="input" id="kname" data-ph="API Key 名称"></div><div style="text-align:right;margin-top:18px"><span class="btn ghost">取消</span>　<span class="btn" id="kok">创建</span></div></div>`); }
+function keyCreated(){ document.querySelector('#mask').remove(); document.querySelector('#modal').remove();
+  document.querySelector('#list').innerHTML=`<div class="row"><div><b>智能解说</b><div style="color:#7a84a8;font-size:12px;margin-top:3px;font-family:Consolas">ark-3f7a••••••••••••••••••••c91e</div></div><div><span class="badge">启用</span>　<span class="btn ghost" id="copy" style="padding:6px 14px">📋 复制</span></div></div>`; toast('✅ 创建成功'); }
+
+// ===== 播放引擎 =====
+const page=document.querySelector('#page'), cursor=document.querySelector('#cursor'), cap=document.querySelector('#caption'), urlEl=document.querySelector('#url'), stepsEl=document.querySelector('#steps'), bar=document.querySelector('#bar');
+let cur=0, paused=false, token=0;
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+async function waitPlay(tk){ while(paused){ await sleep(100); if(tk!==token) throw 0; } if(tk!==token) throw 0; }
+function center(el){ const b=document.querySelector('.browser').getBoundingClientRect(), r=el.getBoundingClientRect(); return [r.left-b.left+r.width/2, r.top-b.top+r.height/2]; }
+async function moveTo(el,tk){ const [x,y]=center(el); cursor.style.left=(x-4)+'px'; cursor.style.top=(y-2)+'px'; await sleep(950); await waitPlay(tk); }
+async function click(el,tk){ el.classList.add('glow'); await moveTo(el,tk); const [x,y]=center(el); const r=document.createElement('div'); r.className='ripple'; r.style.left=x+'px'; r.style.top=y+'px'; document.querySelector('.browser').appendChild(r); setTimeout(()=>r.remove(),650);
+  el.classList.add('pressed'); await sleep(180); el.classList.remove('pressed','glow'); await sleep(250); }
+async function type(el,text,fast,tk){ await click(el,tk); el.textContent=''; for(const ch of text){ el.textContent+=ch; await sleep(fast?18:70); await waitPlay(tk); } await sleep(300); }
+function renderSteps(){ stepsEl.innerHTML=SCENES.map((s,i)=>`<div class="step ${i===cur?'active':i<cur?'done':''}" data-i="${i}"><div class="no">${i<cur?'✓':i+1}</div><div>${s.title}</div></div>`).join(''); stepsEl.querySelectorAll('.step').forEach(e=>e.onclick=()=>go(+e.dataset.i)); bar.style.width=((cur+1)/SCENES.length*100)+'%'; }
+async function runScene(i){ const tk=++token; cur=i; renderSteps(); const s=SCENES[i]; urlEl.innerHTML=s.url; page.innerHTML=`<div class="scene">${s.html}</div>`;
+  cap.innerHTML=`<span class="tag">第 ${i+1}/${SCENES.length} 步</span>`; cursor.style.left='60%'; cursor.style.top='75%';
+  try { await sleep(500); await waitPlay(tk);
+    for(const a of s.acts){
+      if(a.s) cap.innerHTML=`<span class="tag">第 ${i+1}/${SCENES.length} 步</span>${a.s}`;
+      if(a.w) await sleep(a.w);
+      if(a.t) await type(document.querySelector(a.t),a.v,a.fast,tk);
+      if(a.c) await click(document.querySelector(a.c),tk);
+      if(a.f) a.f();
+      await waitPlay(tk);
+    }
+    await sleep(2200); await waitPlay(tk);
+    if(i<SCENES.length-1) runScene(i+1); else { renderSteps(); stepsEl.querySelectorAll('.step').forEach(e=>e.classList.add('done')); }
+  } catch(e) { /* 被跳转打断 */ } }
+function go(i){ paused=false; document.querySelector('#play').textContent='⏸ 暂停'; runScene(Math.max(0,Math.min(SCENES.length-1,i))); }
+document.querySelector('#prev').onclick=()=>go(cur-1);
+document.querySelector('#next').onclick=()=>go(cur+1);
+document.querySelector('#replay').onclick=()=>go(cur);
+document.querySelector('#play').onclick=e=>{ paused=!paused; e.target.textContent=paused?'▶ 继续':'⏸ 暂停'; };
+runScene(0);
+</script>
+</body>
+</html>
