@@ -5,18 +5,25 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>军哥团队智能匹配软件 · 动画教程</title>
 <style>
-:root { --bg:#0b1020; --panel:#121a33; --line:#24305a; --text:#e8ecff; --dim:#8a94c0; --blue:#3b6cff; --cyan:#22d3ee; --warn:#f59e0b; }
+:root { --bg:#0b1020; --panel:#121a33; --line:#24305a; --text:#e8ecff; --dim:#8a94c0; --blue:#3b6cff; --cyan:#22d3ee; --warn:#f59e0b; --ok:#22c55e; }
 * { box-sizing:border-box; margin:0; padding:0; }
 body { font-family:'Microsoft YaHei','PingFang SC',sans-serif; background:radial-gradient(1200px 600px at 70% -10%, #1d2b66 0%, var(--bg) 60%); color:var(--text); min-height:100vh; padding:48px 20px; }
-.box { max-width:980px; margin:0 auto; }
+.box { max-width:1080px; margin:0 auto; }
 h1 { font-size:30px; } h1 span { background:linear-gradient(90deg,var(--cyan),var(--blue)); -webkit-background-clip:text; color:transparent; }
-.sub { color:var(--dim); margin:10px 0 32px; font-size:15px; }
-.grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:18px; }
-a.card { display:block; text-decoration:none; color:inherit; background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:22px; transition:.2s; }
+.sub { color:var(--dim); margin:10px 0 26px; font-size:15px; }
+.promo { border-radius:16px; overflow:hidden; border:1px solid #2b376b; box-shadow:0 20px 60px rgba(0,0,0,.45); background:#000; }
+.promo video { display:block; width:100%; aspect-ratio:16/9; }
+.sec { margin:36px 0 14px; font-size:15px; color:var(--warn); letter-spacing:1px; display:flex; align-items:center; gap:10px; }
+.sec::after { content:''; flex:1; height:1px; background:var(--line); }
+.grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:18px; }
+a.card { display:block; text-decoration:none; color:inherit; background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:22px; transition:.2s; position:relative; }
 a.card:hover { border-color:var(--blue); transform:translateY(-3px); box-shadow:0 10px 30px rgba(59,108,255,.25); }
+a.card.hot { border-color:rgba(34,211,238,.55); background:linear-gradient(145deg,#13224a,#121a33); }
 .ico { font-size:34px; } .t { font-size:18px; font-weight:bold; margin:12px 0 8px; } .d { color:#b7c0e6; font-size:13px; line-height:1.7; }
 .tag { display:inline-block; margin-top:12px; font-size:12px; color:var(--warn); border:1px solid rgba(245,158,11,.4); border-radius:6px; padding:2px 8px; }
-.order { margin-top:34px; background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:18px 22px; color:#c3cbef; font-size:14px; line-height:1.9; }
+.tag.c { color:var(--cyan); border-color:rgba(34,211,238,.45); }
+.new { position:absolute; right:14px; top:14px; font-size:11px; font-weight:bold; color:#05252a; background:var(--cyan); border-radius:10px; padding:1px 8px; }
+.order { margin-top:34px; background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:18px 22px; color:#c3cbef; font-size:14px; line-height:2; }
 .order b { color:var(--warn); }
 .foot { margin-top:26px; color:var(--dim); font-size:12px; text-align:center; }
 </style>
@@ -25,12 +32,30 @@ a.card:hover { border-color:var(--blue); transform:translateY(-3px); box-shadow:
 <div class="box">
   <h1>🎬 <span>军哥团队智能匹配软件</span> · 动画教程</h1>
   <div class="sub">每个教程都会自动播放，鼠标演示每一步操作；也可以暂停、上一步 / 下一步、点左侧步骤跳转。</div>
+
+  <div class="promo"><video src="promo.mp4" controls playsinline preload="metadata"></video></div>
+
+  <div class="sec">① 开始之前 · 申请模型 Key</div>
   <div class="grid">
-    <a class="card" href="doubao.html"><div class="ico">🫘</div><div class="t">豆包大模型 API Key 申请</div><div class="d">注册火山引擎 → 实名认证 → 开通 lite / turbo 模型 → 创建 API Key → 填进软件。</div><span class="tag">第一次使用必看</span></a>
-    <a class="card" href="narration.html"><div class="ico">🎙️</div><div class="t">智能解说（传统 + 弹幕）</div><div class="d">剪映智能分割 + 识别字幕 → 软件一键写文案、配音、出草稿；第四部分讲弹幕解说（原声 + 旁白，高光混剪留悬念）。</div><span class="tag">AI 写文案</span></a>
+    <a class="card" href="doubao.html"><div class="ico">🫘</div><div class="t">豆包大模型 API Key 申请</div><div class="d">注册火山引擎 → 实名认证 → 开通 lite / turbo 模型 → 创建 API Key → 填进软件。智能解说、文案粗剪要用。</div><span class="tag">第一次使用必看</span></a>
+    <a class="card" href="deepseek.html"><span class="new">NEW</span><div class="ico">🐋</div><div class="t">DeepSeek 申请 + AI 改写文案</div><div class="d">官网申请 Key、充值 10 元 → 填进软件设置 → AI改写（匹配专用）逐条改写 → 应用回剪映草稿。</div><span class="tag c">改写文案用</span></a>
+  </div>
+
+  <div class="sec">② 核心功能</div>
+  <div class="grid">
+    <a class="card hot" href="match.html"><span class="new">NEW</span><div class="ico">🎯</div><div class="t">自动匹配（主功能）</div><div class="d">爆款放主轨道、原片放副轨道 → 先识别字幕再智能分割 → 选模型、选草稿 → 一键把原片镜头匹配到副轨道。</div><span class="tag c">核心功能</span></a>
+  </div>
+
+  <div class="sec">③ AI 创作</div>
+  <div class="grid">
+    <a class="card" href="narration.html"><div class="ico">🎙️</div><div class="t">智能解说（传统 + 弹幕）</div><div class="d">剪映里先识别字幕、再智能分割 → 软件一键写文案、配音、出草稿；第四部分讲弹幕解说（原声 + 旁白，高光混剪留悬念）。</div><span class="tag">AI 写文案</span></a>
     <a class="card" href="rough-cut.html"><div class="ico">✂️</div><div class="t">文案粗剪</div><div class="d">你自己写好文案 → AI 逐句配画面 → 配音 → 剪映草稿；同一部片子换文案秒出，可一次生成多个版本。</div><span class="tag">自己的文案</span></a>
   </div>
-  <div class="order">建议观看顺序：<b>① 豆包申请</b>（拿到 Key）→ <b>② 智能解说</b> 或 <b>③ 文案粗剪</b>（看你是想让 AI 写文案，还是用自己的文案）。</div>
+
+  <div class="order">
+    <b>做爆款二创：</b>自动匹配 → DeepSeek 改写文案 → 配音 → 对齐 → 去重。<br>
+    <b>做原创解说：</b>先申请豆包 Key → 智能解说（AI 写文案）或 文案粗剪（用自己的文案）。
+  </div>
   <div class="foot">教程界面为示意，按钮位置以实际软件 / 剪映版本为准</div>
 </div>
 </body>

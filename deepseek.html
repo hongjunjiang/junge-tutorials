@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DeepSeek API 申请 + 文案改写 · 动画教程</title>
+<style>
+:root { --bg:#0b1020; --panel:#121a33; --line:#24305a; --text:#e8ecff; --dim:#8a94c0; --blue:#3b6cff; --cyan:#22d3ee; --ok:#22c55e; --warn:#f59e0b; }
+* { box-sizing:border-box; margin:0; padding:0; }
+body { font-family:'Microsoft YaHei','PingFang SC',sans-serif; background:radial-gradient(1200px 600px at 70% -10%, #1d2b66 0%, var(--bg) 60%); color:var(--text); min-height:100vh; display:flex; flex-direction:column; align-items:center; padding:28px 20px; }
+h1 { font-size:26px; letter-spacing:1px; } h1 span { background:linear-gradient(90deg,var(--cyan),var(--blue)); -webkit-background-clip:text; color:transparent; }
+.sub { color:var(--dim); margin:8px 0 22px; font-size:14px; }
+.wrap { display:flex; gap:22px; width:min(1240px,100%); }
+.steps { width:250px; flex-shrink:0; background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:14px; height:fit-content; }
+.grpT { font-size:12px; color:var(--warn); padding:8px 10px 4px; letter-spacing:1px; }
+.step { display:flex; gap:10px; align-items:flex-start; padding:9px 10px; border-radius:10px; cursor:pointer; color:var(--dim); transition:.25s; font-size:14px; line-height:1.4; }
+.step .no { width:26px; height:26px; border-radius:50%; border:2px solid var(--line); display:flex; align-items:center; justify-content:center; font-size:13px; flex-shrink:0; transition:.25s; }
+.step.active { background:rgba(59,108,255,.15); color:var(--text); }
+.step.active .no { border-color:var(--blue); background:var(--blue); color:#fff; box-shadow:0 0 14px var(--blue); }
+.step.done .no { border-color:var(--ok); background:var(--ok); color:#fff; } .step.done { color:#b7c0e6; }
+.stage { flex:1; min-width:0; }
+.win { border-radius:14px; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,.45); border:1px solid #2b376b; position:relative; background:#0d1117; }
+.bar { background:#1b1f27; padding:9px 14px; display:flex; align-items:center; gap:10px; color:#9aa3b8; font-size:13px; }
+.dots i { display:inline-block; width:11px; height:11px; border-radius:50%; margin-right:6px; }
+.dots i:nth-child(1){background:#ff5f57}.dots i:nth-child(2){background:#febc2e}.dots i:nth-child(3){background:#28c840}
+.page { height:560px; position:relative; overflow:hidden; font-size:13px; }
+.page > .scene { position:absolute; inset:0; animation:fadeIn .45s ease; }
+@keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+#cursor { position:absolute; left:60%; top:75%; width:22px; height:22px; z-index:50; pointer-events:none; transition:left .9s cubic-bezier(.6,.05,.3,1), top .9s cubic-bezier(.6,.05,.3,1); filter:drop-shadow(0 2px 3px rgba(0,0,0,.5)); }
+.ripple { position:absolute; width:14px; height:14px; border-radius:50%; border:3px solid var(--cyan); z-index:49; pointer-events:none; animation:rip .6s ease-out forwards; }
+@keyframes rip { from { transform:translate(-50%,-50%) scale(.4); opacity:1; } to { transform:translate(-50%,-50%) scale(3.2); opacity:0; } }
+.pressed { transform:scale(.94); filter:brightness(.9); } .glow { box-shadow:0 0 0 2px rgba(34,211,238,.7), 0 0 20px rgba(34,211,238,.6) !important; }
+.caption { margin-top:16px; background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:14px 18px; min-height:78px; font-size:15px; line-height:1.7; }
+.caption .tag { display:inline-block; background:var(--blue); color:#fff; border-radius:6px; padding:0 8px; font-size:12px; margin-right:8px; }
+.caption code { background:#0b1230; color:var(--cyan); padding:1px 6px; border-radius:5px; font-family:Consolas,monospace; font-size:13px; }
+.caption .warn { color:var(--warn); }
+.ctrl { margin-top:14px; display:flex; gap:10px; align-items:center; }
+.ctrl button { background:var(--panel); color:var(--text); border:1px solid var(--line); border-radius:9px; padding:8px 16px; cursor:pointer; font-size:14px; font-family:inherit; }
+.ctrl button:hover { border-color:var(--blue); } .ctrl button.pri { background:var(--blue); border-color:var(--blue); }
+.prog { flex:1; height:6px; background:var(--line); border-radius:3px; overflow:hidden; } .prog i { display:block; height:100%; width:0; background:linear-gradient(90deg,var(--cyan),var(--blue)); transition:width .5s; }
+.tips { width:min(1240px,100%); margin-top:22px; display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+.tip { background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:14px 16px; font-size:13px; line-height:1.7; color:#c3cbef; } .tip b { color:var(--warn); display:block; margin-bottom:4px; font-size:14px; }
+.toast { position:absolute; left:50%; top:54px; transform:translateX(-50%); background:#16a34a; color:#fff; padding:8px 18px; border-radius:8px; font-size:14px; z-index:20; animation:fadeIn .3s; }
+
+/* ===== 浏览器 + DeepSeek 开放平台（示意） ===== */
+.br { position:absolute; inset:0; background:#0f0f12; color:#e5e7eb; }
+.addr { height:40px; background:#1f2128; display:flex; align-items:center; gap:10px; padding:0 14px; border-bottom:1px solid #2c2f38; }
+.addr .u { flex:1; background:#2a2d36; border-radius:16px; padding:6px 14px; color:#cfd3dc; min-height:28px; font-size:13px; }
+.addr .u:empty::before { content:'输入网址'; color:#6b7080; }
+.ds { position:absolute; left:0; right:0; top:40px; bottom:0; background:#141414; }
+.dsSide { position:absolute; left:0; top:0; bottom:0; width:190px; background:#1a1a1a; border-right:1px solid #262626; padding:14px 10px; }
+.logo { font-size:20px; font-weight:bold; color:#fff; letter-spacing:.5px; padding:0 8px 14px; display:flex; align-items:center; gap:6px; } .logo i { font-style:normal; font-size:10px; background:#4d6bfe; color:#fff; border-radius:4px; padding:1px 5px; }
+.dsNav { padding:8px 10px; border-radius:7px; color:#b5b5b5; margin-bottom:3px; } .dsNav.on { background:#2b2b2b; color:#fff; }
+.dsMain { position:absolute; left:190px; right:0; top:0; bottom:0; padding:22px 30px; overflow:hidden; }
+.dsMain h2 { font-size:18px; margin-bottom:8px; } .dsMain .ds2 { color:#8b8b8b; font-size:12px; line-height:1.7; margin-bottom:16px; }
+.dsBtn { display:inline-block; background:#fff; color:#111; border-radius:8px; padding:6px 14px; font-weight:bold; font-size:12px; } .dsBtn.blue { background:#4d6bfe; color:#fff; } .dsBtn.gray { background:#2b2b2b; color:#ddd; }
+.dsTable { width:100%; border-collapse:collapse; font-size:12px; margin-top:12px; } .dsTable th { color:#8b8b8b; text-align:left; font-weight:normal; padding:8px; border-bottom:1px solid #262626; } .dsTable td { padding:10px 8px; border-bottom:1px solid #262626; }
+.dsInput { background:#222; border:1px solid #333; border-radius:8px; padding:8px 12px; color:#eee; min-height:34px; margin-bottom:10px; } .dsInput:empty::before { content:attr(data-ph); color:#666; }
+.dsCard { background:#1c1c1c; border:1px solid #2a2a2a; border-radius:12px; padding:18px 20px; }
+.amt { display:inline-block; width:96px; text-align:center; padding:12px 0; border:2px solid #333; border-radius:10px; margin-right:10px; font-size:15px; font-weight:bold; } .amt.on { border-color:#4d6bfe; background:rgba(77,107,254,.15); }
+.modal { position:absolute; inset:0; background:rgba(0,0,0,.6); display:flex; align-items:center; justify-content:center; animation:fadeIn .25s; z-index:5; }
+.modal .box { width:440px; background:#2b2b2d; border-radius:22px; padding:22px 26px; }
+.modal h3 { font-size:18px; margin-bottom:12px; display:flex; } .modal h3 .x { margin-left:auto; font-weight:normal; color:#ddd; }
+.modal .mt { color:#e5e5e5; font-size:13px; margin-bottom:12px; } .modal .mt.dim { color:#a3a3a3; line-height:1.7; }
+.pill { border:1.5px solid #d4d4d4; border-radius:24px; padding:10px 18px; min-height:42px; color:#fff; font-size:14px; } .pill:empty::before { content:attr(data-ph); color:#777; }
+.pbtnD { display:inline-block; border-radius:22px; padding:8px 24px; font-size:14px; border:1px solid #444; color:#eee; } .pbtnD.w { background:#f5f5f5; color:#111; border-color:#f5f5f5; } .pbtnD.dis { background:#777; color:#ddd; border-color:#777; }
+.keyRow { display:flex; align-items:center; border:1px solid #444; border-radius:26px; padding:5px 5px 5px 18px; margin:6px 0 14px; } .keyRow .k { flex:1; font-family:Consolas,monospace; font-size:14px; color:#eee; overflow:hidden; white-space:nowrap; }
+.login { width:340px; margin:50px auto 0; text-align:center; } .login .logo { justify-content:center; font-size:26px; }
+
+/* ===== 软件（真实界面配色 dark_blue） ===== */
+.app { position:absolute; inset:0; background:#0a0e14; color:#e6edf3; display:flex; font-size:13px; }
+.side { width:200px; background:#0d1117; border-right:1px solid #30363d; flex-shrink:0; }
+.verTabs { display:flex; gap:8px; padding:12px; border-bottom:1px solid #30363d; }
+.verTabs span { flex:1; text-align:center; padding:8px 0; border-radius:7px; background:#161b22; border:2px solid transparent; color:#7d8590; font-weight:bold; }
+.verTabs span.on { border-color:#1f6feb; color:#58a6ff; background:#0d1a2e; }
+.nav { padding:10px 16px; display:flex; align-items:center; gap:10px; border-left:3px solid transparent; color:#e6edf3; }
+.nav .ar { margin-left:auto; color:#7d8590; font-size:11px; transition:transform .2s; } .nav.exp .ar { transform:rotate(90deg); }
+.nav.on { background:linear-gradient(90deg,rgba(31,111,235,.2),transparent); border-left-color:#1f6feb; color:#1f6feb; }
+.nav.subn { padding:8px 16px 8px 40px; font-size:12px; display:none; } .nav.subn.show { display:flex; animation:fadeIn .25s; }
+.main { flex:1; overflow:hidden; position:relative; }
+#am { position:relative; padding:18px 26px 40px; transition:transform .7s cubic-bezier(.5,.05,.3,1); }
+.secT { display:flex; align-items:center; gap:10px; font-size:16px; font-weight:bold; margin-bottom:14px; }
+.secT .ic { background:#161b22; padding:4px 7px; border-radius:5px; }
+.vip { background:#f59e0b; color:#2a1a00; font-size:11px; border-radius:10px; padding:1px 9px; }
+.ecard { background:#161b22; border:1px solid #30363d; border-radius:10px; padding:18px 22px; }
+.ecard h3 { font-size:15px; } .ecard > p { color:#7d8590; font-size:12px; margin:4px 0 12px; }
+.lab { margin:10px 0 6px; }
+.inp { background:#21262d; border:1px solid #30363d; border-radius:6px; padding:7px 12px; min-height:33px; width:440px; color:#e6edf3; } .inp:empty::before { content:attr(data-ph); color:#6e7681; }
+.inp.sm { width:280px; } .hint2 { color:#888; font-size:11px; margin-top:4px; }
+.cbtn { display:inline-block; background:#161b22; border:1px solid #30363d; border-radius:4px; padding:4px 10px; }
+.btnP { display:inline-block; background:#1f6feb; color:#fff; border-radius:6px; padding:8px 20px; font-weight:bold; }
+.btnG { display:inline-block; background:#444; color:#fff; border-radius:6px; padding:8px 20px; font-weight:bold; }
+.btnO { display:inline-block; background:#e67e22; color:#fff; border-radius:6px; padding:8px 20px; font-weight:bold; }
+.resBox { margin-top:12px; padding:10px 12px; background:#1a1a2e; border:1px solid #333; border-radius:6px; display:none; line-height:1.6; } .resBox.show { display:block; animation:fadeIn .3s; }
+.plot { padding:10px 14px; background:#1a1a2e; border:1px solid #2a4a3a; border-radius:8px; margin-bottom:12px; }
+.pbtn { display:inline-block; font-size:12px; border-radius:4px; padding:4px 10px; margin-right:6px; border:1px solid; }
+.ro { display:inline-flex; gap:6px; align-items:center; color:#7d8590; margin:0 16px 6px 0; } .ro input { accent-color:#1f6feb; } .ro input:checked + span { color:#e6edf3; }
+.hr { border-top:1px solid #30363d; margin:14px 0; }
+.dgrid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:10px; }
+.dcard { background:#161b22; border:2px solid #30363d; border-radius:6px; padding:9px; text-align:center; } .dcard.selected { border-color:#1f6feb; background:rgba(31,111,235,.15); }
+.dcard .n { font-weight:bold; } .dcard .c { color:#7d8590; font-size:11px; }
+.tbl { display:none; } .tbl.show { display:block; animation:fadeIn .3s; }
+.tbl .cbtn { font-size:12px; font-weight:normal; }
+.tblBox { background:#0a0a15; border:1px solid #333; border-radius:8px; height:300px; overflow:hidden; position:relative; }
+.tblBox table { width:100%; border-collapse:collapse; table-layout:fixed; font-size:13px; transition:transform .8s; } .tblBox th { background:#1a1a2e; padding:10px 8px; text-align:left; font-weight:normal; color:#c9d1d9; border-bottom:1px solid #333; } .tblBox td { padding:8px; border-bottom:1px solid #222; vertical-align:top; }
+.cc { font-size:11px; color:#555; margin-top:2px; min-height:14px; }
+.rin { background:#1a1a2e; border:1px solid #333; border-radius:4px; padding:6px 10px; color:#0096ff; min-height:30px; } .rin:empty::before { content:attr(data-ph); color:#555; } .rin.new { animation:fadeIn .3s; }
+.repl { display:flex; align-items:center; gap:8px; margin:10px 0; padding:9px 14px; background:#1a1a2e; border:1px solid #333; border-radius:8px; } .rin2 { flex:1; background:#0d0d1a; border:1px solid #444; border-radius:4px; padding:5px 10px; color:#666; }
+.pbar2 { height:22px; background:#21262d; border:1px solid #30363d; border-radius:11px; overflow:hidden; position:relative; margin:12px 0 8px; } .pbar2 i { display:block; height:100%; width:0; background:#1f6feb; transition:width .3s; } .pbar2 span { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:bold; }
+.logbox { margin-top:10px; background:#161b22; border:1px solid #30363d; border-radius:6px; height:124px; overflow:hidden; padding:8px 12px; font-family:Consolas,'Microsoft YaHei',monospace; font-size:12px; line-height:1.7; color:#9da7b3; } .logbox .ok { color:#3fb950; }
+</style>
+</head>
+<body>
+<a href="index.html" style="position:fixed;left:18px;top:14px;color:#8a94c0;font-size:13px;text-decoration:none;border:1px solid #24305a;border-radius:8px;padding:5px 12px;background:#121a33;z-index:99">← 教程首页</a>
+<h1>🐋 <span>DeepSeek API 申请 + 文案改写</span> 动画教程</h1>
+<div class="sub">官网申请 Key → 填进软件 → 用 AI 改写剪映草稿里的解说文案　｜　自动播放，点左侧步骤可跳转</div>
+<div class="wrap">
+  <div class="steps" id="steps"></div>
+  <div class="stage">
+    <div class="win">
+      <div class="bar"><div class="dots"><i></i><i></i><i></i></div><span id="wtitle"></span></div>
+      <div class="page" id="page"></div>
+      <svg id="cursor" viewBox="0 0 24 24"><path d="M3 2l7 19 2.6-7.4L20 11z" fill="#fff" stroke="#111" stroke-width="1.6" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="caption" id="caption"></div>
+    <div class="ctrl"><button id="prev">⏮ 上一步</button><button id="play" class="pri">⏸ 暂停</button><button id="next">下一步 ⏭</button><button id="replay">🔁 重播本步</button><div class="prog"><i id="bar"></i></div></div>
+  </div>
+</div>
+<div class="tips">
+  <div class="tip"><b>⚠️ 测试连接报错不用管</b>DeepSeek 点「测试连接」一般会提示「模型返回空内容，请检查模型名称是否正确」。只要「保存设置」后，改写能正常出结果，就是配好了。</div>
+  <div class="tip"><b>🔑 Key 只显示一次</b>DeepSeek 创建完 Key 只显示这一次，马上复制保存。丢了就删掉重新建一个。</div>
+  <div class="tip"><b>⚖️ pro 还是 flash</b><code style="color:#22d3ee">deepseek-v4-pro</code> 改写效果更好；<code style="color:#22d3ee">deepseek-v4-flash</code> 更便宜。充 10 元够改很多条。</div>
+  <div class="tip"><b>🎬 原片对白先分出去</b>草稿里有角色原声对白的字幕，先点「🤖 AI识别剧情」，把对白移到别的轨道并锁定，只改写解说词。</div>
+  <div class="tip"><b>🔄 二次优化如无必要不用点</b>改写后字数标红只说明比原文多了 20% 以上，一般不影响。只有句子明显太长、配音对不上画面时，才用「二次优化」缩短。</div>
+  <div class="tip"><b>✅ 别忘了应用改写</b>改写结果先显示在表格里，可以手动修改。点「应用改写」后才会写回剪映草稿。</div>
+</div>
+<script>
+const q = s => document.querySelector(s);
+const KEY = 'sk-c203e6f1a9d84b27b5c0e3d71f2a8e98';
+const KEYM = 'sk-c203e••••••••••••••••••••••8e98';
+const LINES = [
+  ['男人误闯进了一个怪异的小镇','一个男人稀里糊涂闯进了一座诡异小镇'],
+  ['他发现镇上的居民竟然全是假人','他这才发现，镇上居民居然清一色全是假人'],
+  ['他细细观察','他凑近仔细一瞧'],
+  ['远处竟然悬挂着一枚原子弹','远处半空中竟赫然挂着一枚原子弹'],
+  ['吓得他心跳猛增','当场把他吓得心脏狂跳'],
+  ['一秒600次','一秒能蹦600下'],
+  ['原来这里是核弹试验场','原来这儿竟是一处核弹试验场'],
+  ['他必须在爆炸前逃出去','他必须赶在爆炸前拼命逃出去'],
+];
+
+// ===== 浏览器 / DeepSeek =====
+const DSSIDE = on => `<div class="dsSide"><div class="logo">deepseek <i>开放平台</i></div>
+  ${[['dsUsage','📊 用量信息'],['dsKeys','🔍 API keys'],['dsPay','💳 充值'],['dsBill','🧾 账单']].map(n=>`<div class="dsNav ${n[0]===on?'on':''}" id="${n[0]}">${n[1]}</div>`).join('')}</div>`;
+const USAGE = `<h2>用量信息</h2><div class="ds2">账户余额</div><div style="font-size:30px;font-weight:bold" id="bal">¥ 0.00</div>
+  <div class="ds2" style="margin-top:10px;display:flex;align-items:center;gap:10px" id="authSt">⚠ 未实名认证，暂不能使用 API <span class="dsBtn" id="dsAuth">去实名认证</span></div>`;
+const BR = (url, inner) => `<div class="br"><div class="addr"><span>←</span><span>→</span><span>⟳</span><div class="u" id="url">${url}</div></div><div class="ds" id="ds">${inner}</div></div>`;
+
+// ===== 软件 =====
+function SIDE(active){ const rw = active==='rewrite';
+  return `<div class="side"><div class="verTabs"><span class="on">✂️ 剪映版</span><span>🎬 PR版</span></div>
+  <div class="nav">⚙️ <span>初始化</span></div><div class="nav">🎬 <span>自动匹配（主功能）</span></div>
+  <div class="nav ${rw?'exp':''}" id="navRwMenu">✏️ <span>文案改写</span><span class="ar">▶</span></div>
+  <div class="nav subn ${rw?'show on':''}" id="navRw">📝 <span>AI改写（匹配专用）</span></div><div class="nav subn ${rw?'show':''}" id="navSe">🚀 <span>文案提升</span></div>
+  <div class="nav">🎤 <span>配音</span><span class="ar">▶</span></div><div class="nav">📐 <span>对齐</span><span class="ar">▶</span></div><div class="nav">🔀 <span>去重</span><span class="ar">▶</span></div>
+  <div class="nav">🧠 <span>智能原创</span><span class="ar">▶</span></div><div class="nav">🏎️ <span>一键全自动</span></div><div class="nav">🧰 <span>实用功能</span><span class="ar">▶</span></div>
+  <div class="nav ${active==='settings'?'on':''}" id="navSet">⚙️ <span>软件设置</span></div><div class="nav">🔑 <span>激活软件</span></div></div>`; }
+const SETPAGE = (filled) => `<div class="secT"><span class="ic">⚙️</span>软件设置</div>
+  <div class="ecard"><h3>AI大模型配置</h3><p>配置用于文案改写的AI模型接口</p>
+    <div class="lab">API URL：</div><div class="inp" id="url2" data-ph="填写你的 API 地址，例如 https://xxx.com/v1">${filled?'https://api.deepseek.com/v1':''}</div><div class="hint2">填写你自己的 API 服务地址（OpenAI 兼容格式）</div>
+    <div class="lab">模型名称：</div><div class="inp sm" id="msel" style="display:flex;justify-content:space-between">${filled?'自定义...':'gpt-5.2'}<span>▾</span></div>
+    <div class="inp sm" id="mcus" style="margin-top:6px;display:${filled?'block':'none'}" data-ph="输入自定义模型名称">${filled?'deepseek-v4-flash':''}</div>
+    <div class="lab">API Key：</div><div class="inp" id="key2" data-ph="输入你的 API Key">${filled?'••••••••••••••••••••••••••••••••••':''}</div>
+    <div style="margin-top:6px"><span class="cbtn">👁️</span></div><div style="margin-top:6px;color:#58a6ff;font-size:12px">📋 API Key 申请指南</div>
+    <div style="margin-top:14px;display:flex;gap:10px"><span class="btnP" id="save">💾 保存设置</span><span class="btnG" id="test">🔗 测试连接</span></div>
+    <div class="resBox" id="res"></div></div>`;
+const DRAFTS = [['惊魂模特_匹配完成','186','11/12 15:02','dT'],['智能解说_11月11日_1803','813','11/11 18:04'],['智能解说_11月11日_1745','819','11/11 17:50']];
+const RWPAGE = () => `<div class="secT"><span class="ic">✏️</span>AI改写（匹配专用）<span class="vip">VIP功能</span></div>
+  <div class="plot"><div style="color:#ccc;margin-bottom:8px">🎬 剧情字幕识别与分轨 <span style="color:#666;font-size:11px">（剧情字幕移至新轨道并锁定，仅保留解说字幕供AI改写）</span></div>
+    <span class="pbtn" id="aiPlot" style="background:#352447;border-color:#8050a8;color:#e5c8ff">🤖 AI识别剧情（推荐）</span><span class="pbtn" style="background:#1a2a3a;border-color:#2a4a6a">🎯 声纹分离</span><span class="pbtn" style="background:#1a3a2a;border-color:#2a5a3a">🔀 旧版分离</span>
+    <div id="plotRes" style="font-size:12px;color:#3fb950;margin-top:6px"></div></div>
+  <div style="margin-bottom:6px">请选择AI改写类型：</div>
+  <div><label class="ro" id="tDy"><input type="radio" name="rt" checked><span>抖音网文改写</span></label><label class="ro"><input type="radio" name="rt"><span>同义改写</span></label><label class="ro"><input type="radio" name="rt"><span>翻译</span></label><label class="ro"><input type="radio" name="rt"><span>✨ 精简翻译（脱水模式）</span></label><label class="ro"><input type="radio" name="rt"><span>自定义提示词</span></label></div>
+  <div style="margin:6px 0">并发数：<span style="color:#7d8590;font-size:12px">（默认5，如API无限制可增大以加快速度）</span></div><span class="inp" style="display:inline-block;width:60px;text-align:center">5</span>
+  <div class="hr"></div>
+  <div id="drafts"><b>选择草稿</b> <span style="color:#7d8590;font-size:12px;margin-left:8px">选择要改写文案的草稿</span> <span style="margin-left:6px">🔄</span><span style="float:right;color:#58a6ff;font-size:12px">显示更多　展开所有</span>
+    <div class="dgrid">${DRAFTS.map(d=>`<div class="dcard" ${d[3]?`id="${d[3]}"`:''}><div class="n">${d[0]}</div><div class="c">${d[1]} 个片段</div><div class="c">${d[2]}</div></div>`).join('')}</div></div>
+  <div class="tbl" id="tbl"><div class="secT" style="margin:16px 0 10px;font-size:15px"><span class="ic">📝</span>文本内容<span class="cbtn">全选</span><span class="cbtn">取消全选</span><span class="cbtn">📋 复制纯文案 ▾</span><span class="cbtn">📝 一键替换</span></div>
+    <div class="tblBox" id="tblBox"><table><thead><tr><th style="width:38px">选</th><th style="width:36px;text-align:center">序<br>号</th><th>原文</th><th>改写后 (可编辑)</th></tr></thead>
+    <tbody>${LINES.map((l,i)=>`<tr><td><input type="checkbox" checked style="accent-color:#1f6feb;width:15px;height:15px"></td><td style="text-align:center;color:#7d8590">${i+1}</td><td>${l[0]}<div class="cc">${l[0].length}字</div></td><td><div class="rin" id="rw${i}" data-ph="改写结果..."></div><div class="cc" id="rc${i}"></div></td></tr>`).join('')}</tbody></table></div></div>
+  <div class="hr"></div>
+  <div id="acts" style="display:flex;gap:10px"><span class="btnP" id="go">✏️ 开始改写</span><span class="btnO" id="sp">🔄 二次优化</span><span class="btnG" id="apply">✅ 应用改写</span></div>
+  <div class="repl"><span style="color:#888">🔄 统一替换:</span><span class="rin2">查找内容</span><span style="color:#888">→</span><span class="rin2">替换为</span><span style="background:#0096ff;color:#fff;border-radius:4px;padding:5px 12px">替换</span></div>
+  <div class="pbar2"><i id="pb"></i><span id="pt">0%</span></div>
+  <div class="logbox" id="log"></div>`;
+const APP = (active, body) => `<div class="app">${SIDE(active)}<div class="main"><div id="am">${body}</div></div></div>`;
+
+// ===== 场景 =====
+const SCENES = [
+{ grp:'第一部分 · DeepSeek 官网申请', title:'打开官网，登录', win:'浏览器',
+  html: BR('', `<div class="login"><div class="logo">deepseek <i>开放平台</i></div>
+    <div class="dsInput" id="phone" data-ph="请输入手机号" style="text-align:left"></div><div style="display:flex;gap:8px"><div class="dsInput" id="code" data-ph="验证码" style="flex:1;text-align:left"></div><span class="dsBtn gray" style="height:34px;line-height:22px">获取验证码</span></div>
+    <span class="dsBtn blue" id="loginBtn" style="width:100%;padding:9px 0;font-size:14px">登录 / 注册</span></div>`),
+  acts:[{s:'浏览器打开 DeepSeek 开放平台：<code>https://platform.deepseek.com/</code>（这是 API 平台，不是聊天网页）。'},{c:'#url',f:()=>typeInto('#url','https://platform.deepseek.com/',30)},{w:1300},
+        {s:'用手机号登录，没有账号会自动注册。'},{c:'#phone',f:()=>typeInto('#phone','138 •••• 6688',60)},{w:900},{c:'#code',f:()=>typeInto('#code','520131',80)},{w:700},
+        {c:'#loginBtn',f:()=>{ q('#ds').innerHTML=DSSIDE('dsUsage')+`<div class="dsMain">${USAGE}</div>`; }},{w:1400}] },
+
+{ title:'实名认证 + 充值 10 元', win:'浏览器 · platform.deepseek.com',
+  html: BR('https://platform.deepseek.com/usage', DSSIDE('dsUsage')+`<div class="dsMain" id="dm">${USAGE}</div>`),
+  acts:[{s:'进来后先做个简单的 <b>实名认证</b>。<span class="warn">（入口位置以官网提示为准，也可能在右上角头像里）</span>'},
+        {c:'#dsAuth',f:()=>{ q('#dm').innerHTML=`<h2>实名认证</h2><div class="ds2">按国家规定，使用 API 需完成实名认证</div><div class="dsCard" style="width:380px"><div class="dsInput" id="nm" data-ph="真实姓名"></div><div class="dsInput" id="idn" data-ph="身份证号"></div><span class="dsBtn blue" id="authOk">提交认证</span></div>`; }},
+        {c:'#nm',f:()=>typeInto('#nm','张**',90)},{c:'#idn',f:()=>typeInto('#idn','4401**********1234',25)},{w:700},{c:'#authOk',f:()=>toast('✅ 实名认证成功')},{w:900},
+        {s:'然后 <b>充值 10 元</b> 就够用了（改写一条字幕只要几分钱甚至更少）。'},
+        {c:'#dsPay',f:()=>{ setOn('dsPay'); q('#dm').innerHTML=`<h2>充值</h2><div class="ds2">选择充值金额</div><div style="margin-bottom:16px"><span class="amt" id="a10">¥10</span><span class="amt">¥50</span><span class="amt">¥100</span><span class="amt">自定义</span></div><span class="dsBtn blue" id="payBtn">微信 / 支付宝 支付</span>`; }},
+        {c:'#a10',f:()=>q('#a10').classList.add('on')},{c:'#payBtn',f:()=>{ toast('✅ 充值成功 ¥10.00'); setOn('dsUsage'); q('#dm').innerHTML=USAGE; q('#bal').textContent='¥ 10.00'; q('#authSt').textContent='✅ 已实名认证'; }},{w:1600}] },
+
+
+{ title:'创建 API Key 并复制', win:'浏览器 · platform.deepseek.com',
+  html: BR('https://platform.deepseek.com/api_keys', DSSIDE('dsUsage')+`<div class="dsMain" id="dm"><h2>API keys</h2>
+    <div class="ds2">列表内是你的全部 API key，API key 仅在创建时可见可复制，请妥善保存。不要与他人共享你的 API key，或将其暴露在浏览器或其他客户端代码中。<br>为了保护你的帐户安全，我们可能会自动禁用我们发现已公开泄露的 API key。我们未对 2024 年 4 月 25 日前创建的 API key 的使用情况进行追踪。<br>单个账号最多可以保留 300 个 API Key。</div>
+    <div style="text-align:right"><span class="dsBtn gray" style="border-radius:16px">按 API Key 查看用量</span> <span class="dsBtn" style="border-radius:16px" id="newKey">创建 API key</span></div>
+    <div style="background:#2a2a2a;border-radius:10px;margin-top:12px;padding:0 6px"><table class="dsTable" style="margin-top:0"><thead><tr><th>名称</th><th>Tracking ID</th><th>Key</th><th>创建日期</th><th>最新使用日期</th></tr></thead>
+    <tbody id="kt"><tr><td colspan="5" style="color:#999;text-align:center;padding:44px 0;border:none">暂无 API key，你可以 <b style="color:#fff">创建 API key</b></td></tr></tbody></table></div></div>`),
+  acts:[{s:'点左侧 <b>API keys</b>，再点右边的 <b>创建 API key</b>。'},{c:'#dsKeys',f:()=>setOn('dsKeys')},
+        {c:'#newKey',f:()=>{ q('#ds').insertAdjacentHTML('beforeend',`<div class="modal" id="md"><div class="box"><h3>创建 API key<span class="x">✕</span></h3><div class="mt">单个账号最多可以保留 300 个 API Key。</div><div class="pill" id="kn" data-ph="输入 API key 的名称"></div><div style="text-align:right;margin-top:18px"><span class="pbtnD">取消</span> <span class="pbtnD dis" id="mk">创建</span></div></div></div>`); }},
+        {s:'名称随便填，比如 <code>影视解说</code>，填好后「创建」按钮变亮，点 <b>创建</b>。'},{c:'#kn',f:()=>{ typeInto('#kn','影视解说',150); setTimeout(()=>q('#mk')?.classList.replace('dis','w'),600); }},{w:900},
+        {c:'#mk',f:()=>{ q('#md .box').innerHTML=`<h3>创建 API key<span class="x" id="cls">✕</span></h3><div class="mt dim">请将此 API key 保存在安全且易于访问的地方。出于安全原因，你将无法通过 API keys 管理界面再次查看它。如果你丢失了这个 key，将需要重新创建。</div>
+          <div class="keyRow"><span class="k">${KEY}</span><span class="pbtnD w" id="cp">⧉ 复制</span></div><div class="mt">提示：不要与他人共享你的 API key，或将其暴露在浏览器或其他客户端代码中。</div>`; }},
+        {s:'<b class="warn">这个 Key 只显示这一次！</b> 马上点 <b>⧉ 复制</b>，保存到记事本里。丢了只能重新创建。'},{w:1400},{c:'#cp',f:()=>toast('✅ 已复制到剪贴板')},{w:900},
+        {s:'复制好后点右上角 <b>✕</b> 关掉，列表里就多了这个 Key。'},{c:'#cls',f:()=>{ q('#md').remove(); q('#kt').innerHTML=`<tr><td>影视解说</td><td>-</td><td>${KEYM}</td><td>2026-11-12</td><td>-</td></tr>`; }},{w:1400}] },
+
+{ grp:'第二部分 · 填进软件', title:'软件设置 → AI大模型配置', win:'军哥团队智能匹配软件 · 软件设置',
+  html: APP('', `<div class="secT"><span class="ic">🎬</span>自动匹配（主功能）</div><div style="color:#7d8590">……</div>`),
+  acts:[{s:'打开软件，左侧点 <b>⚙️ 软件设置</b>，找到 <b>AI大模型配置</b>。'},{c:'#navSet',f:()=>{ q('#navSet').classList.add('on'); q('#am').innerHTML=SETPAGE(false); }},{w:900},
+        {s:'<b>API URL</b> 填：<code>https://api.deepseek.com/v1</code>'},{c:'#url2',f:()=>typeInto('#url2','https://api.deepseek.com/v1',28)},{w:1100},
+        {s:'<b>模型名称</b> 下拉选 <b>自定义...</b>，下面填 <code>deepseek-v4-pro</code>（效果更好）或 <code>deepseek-v4-flash</code>（更便宜）。'},
+        {c:'#msel',f:()=>{ q('#msel').innerHTML='自定义...<span>▾</span>'; q('#mcus').style.display='block'; }},{c:'#mcus',f:()=>typeInto('#mcus','deepseek-v4-flash',45)},{w:1100},
+        {s:'<b>API Key</b> 粘贴刚才复制的 Key。'},{c:'#key2',f:()=>typeInto('#key2','••••••••••••••••••••••••••••••••••',12)},{w:900},
+        {s:'填好后 <b>一定要点 💾 保存设置</b>。'},{c:'#save',f:()=>toast('✅ AI 设置已保存')},{w:1200}] },
+
+{ title:'测试连接报错？别在意', win:'军哥团队智能匹配软件 · 软件设置',
+  html: APP('settings', SETPAGE(true)),
+  acts:[{f:()=>{ q('#am').style.transform='translateY(-120px)'; }},{w:800},
+        {s:'可以点 <b>🔗 测试连接</b> 试一下。'},{c:'#test',f:()=>{ const r=q('#res'); r.classList.add('show'); r.innerHTML='<span style="color:#888">🔗 测试连接中...</span>'; setTimeout(()=>{ if(document.body.contains(r)) r.innerHTML='<span style="color:#f85149">❌ 模型返回空内容，请检查模型名称是否正确</span>'; },1300); }},{w:2000},
+        {s:'<b class="warn">DeepSeek 测试一般都不通，会提示「❌ 模型返回空内容，请检查模型名称是否正确」，别在意。</b> 只要模型名称没填错、点了「保存设置」，到文案改写里能正常改写，就说明配好了。'},{w:4200}] },
+
+{ grp:'第三部分 · 文案改写', title:'进入 AI改写，分离剧情字幕', win:'军哥团队智能匹配软件 · AI改写（匹配专用）',
+  html: APP('', `<div class="secT"><span class="ic">⚙️</span>软件设置</div><div style="color:#7d8590">……</div>`),
+  acts:[{s:'左侧点 <b>✏️ 文案改写</b> 展开，再点 <b>📝 AI改写（匹配专用）</b>。'},{c:'#navRwMenu',f:()=>{ q('#navRwMenu').classList.add('exp'); q('#navRw').classList.add('show'); q('#navSe').classList.add('show'); }},
+        {c:'#navRw',f:()=>{ q('#navRw').classList.add('on'); q('#am').innerHTML=RWPAGE(); }},{w:900},
+        {s:'草稿字幕里如果夹着电影原声对白，先点 <b>🤖 AI识别剧情（推荐）</b>：对白字幕会被移到新轨道并锁定，只留下解说词给 AI 改写。<span class="warn">需要先选好草稿，纯解说字幕可以跳过这步。</span>'},
+        {c:'#aiPlot',f:()=>{ q('#plotRes').textContent='✅ 识别完成：12 条剧情对白已移至新轨道并锁定'; }},{w:1800},
+        {s:'改写类型选 <b>抖音网文改写</b>（最常用）。并发数默认 5 就行。'},{c:'#tDy'},{w:1200}] },
+
+{ title:'选择草稿，开始改写', win:'军哥团队智能匹配软件 · AI改写（匹配专用）',
+  html: APP('rewrite', RWPAGE()),
+  acts:[{f:()=>scrollTo('#drafts')},{w:800},
+        {s:'在 <b>选择草稿</b> 里点要改写的草稿（一般是匹配完的那个），下面会列出草稿里的每一条字幕。'},{c:'#dT',f:()=>{ q('#dT').classList.add('selected'); q('#tbl').classList.add('show'); }},{w:900},
+        {f:()=>scrollTo('#tbl')},{w:900},
+        {s:'默认全部勾选。点 <b>✏️ 开始改写</b>，DeepSeek 会逐条改写，结果出现在右边「改写后」一列。'},{f:()=>scrollTo('#acts')},{w:800},{c:'#go',f:runRewrite},{w:3200},
+        {s:'进度条走到 100%，日志里每条显示「第 N 条改写完成」。'},{w:1600},
+        {f:()=>scrollTo('#tbl')},{s:'回到 <b>文本内容</b> 表格看结果：蓝字是改写后的文案，可以直接点进去修改。'},{w:2400}] },
+
+{ title:'检查结果，应用改写', win:'军哥团队智能匹配软件 · AI改写（匹配专用）',
+  html: APP('rewrite', RWPAGE()),
+  acts:[{f:()=>{ q('#dT').classList.add('selected'); q('#tbl').classList.add('show'); LINES.forEach((l,i)=>fillRow(i)); q('#pb').style.width='100%'; q('#pt').textContent='100%';
+          q('#log').innerHTML='开始改写...<br>'+[0,2,1,3,5,4,6,7].map((x,k)=>`[${k+1}/8] 第${x+1}条改写完成<br>`).join('')+'改写完成！<br>'; scrollTo('#tbl'); }},{w:900},
+        {s:'改写后的字数显示在每句下面，<span style="color:#ff6b6b">红色</span>表示比原文多了 20% 以上。抖音网文改写本来就会加词，<b>一般不用管</b>。'},{w:3000},
+        {s:'<b>🔄 二次优化如无必要不需要操作。</b> 只有改写后句子明显太长、后面配音和画面对不上时，才点它把超长的句子缩短。'},{f:()=>{ scrollTo('#acts'); q('#sp').classList.add('glow'); }},{w:3000},{f:()=>q('#sp').classList.remove('glow')},
+        {s:'检查没问题，直接点 <b>✅ 应用改写</b>，改写后的文案就写回剪映草稿的字幕里了。'},{c:'#apply',f:()=>{ log('<span class="ok">改写已应用到草稿！</span><br>'); toast('✅ 改写已应用到草稿'); }},{w:1600},
+        {s:'接下来就可以去 <b>🎤 配音</b> 给新文案配音，再做对齐和去重。🎉'},{w:2200}] },
+];
+
+// ===== 动作函数 =====
+function toast(msg){ const t=document.createElement('div'); t.className='toast'; t.textContent=msg; q('#page').appendChild(t); setTimeout(()=>t.remove(),1600); }
+function typeInto(sel, text, ms){ const el=q(sel); el.textContent=''; let i=0; const t=setInterval(()=>{ if(!document.body.contains(el)) return clearInterval(t); el.textContent+=text[i]; if(++i>=text.length) clearInterval(t); },ms); }
+function setOn(id){ document.querySelectorAll('.dsNav').forEach(e=>e.classList.toggle('on',e.id===id)); }
+function scrollTo(sel){ const el=q(sel); q('#am').style.transform=`translateY(-${Math.max(0,el.offsetTop-14)}px)`; }
+function log(h){ const l=q('#log'); if(l){ l.insertAdjacentHTML('beforeend',h); l.scrollTop=l.scrollHeight; } }
+function fillRow(i){ const c=q('#rw'+i), n=q('#rc'+i); if(!c) return; c.textContent=LINES[i][1]; c.classList.add('new');
+  const len=LINES[i][1].length; n.textContent=len+'字'; n.style.color = len>LINES[i][0].length*1.2 ? '#ff6b6b' : '#555'; }
+function runRewrite(){ log('开始改写...<br>'); const N=LINES.length, order=[0,2,1,3,5,4,6,7];
+  order.forEach((idx,k)=>setTimeout(()=>{ if(!q('#log')) return; fillRow(idx); log(`[${k+1}/${N}] 第${idx+1}条改写完成<br>`);
+    const p=Math.round((k+1)/N*100); q('#pb').style.width=p+'%'; q('#pt').textContent=p+'%'; if(k===N-1) log('改写完成！<br>'); },400+k*330)); }
+
+// ===== 播放引擎 =====
+const page=q('#page'), cursor=q('#cursor'), cap=q('#caption'), wt=q('#wtitle'), stepsEl=q('#steps'), bar=q('#bar');
+let cur=0, paused=false, token=0;
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+async function waitPlay(tk){ while(paused){ await sleep(100); if(tk!==token) throw 0; } if(tk!==token) throw 0; }
+function center(el){ const b=q('.win').getBoundingClientRect(), r=el.getBoundingClientRect(); return [r.left-b.left+Math.min(r.width/2,60), r.top-b.top+r.height/2]; }
+async function moveTo(el,tk){ const [x,y]=center(el); cursor.style.left=(x-4)+'px'; cursor.style.top=(y-2)+'px'; await sleep(950); await waitPlay(tk); }
+async function click(el,tk){ el.classList.add('glow'); await moveTo(el,tk); const [x,y]=center(el); const r=document.createElement('div'); r.className='ripple'; r.style.left=x+'px'; r.style.top=y+'px'; q('.win').appendChild(r); setTimeout(()=>r.remove(),650);
+  el.classList.add('pressed'); await sleep(180); el.classList.remove('pressed','glow'); await sleep(250); }
+function renderSteps(){ stepsEl.innerHTML=SCENES.map((s,i)=>`${s.grp?`<div class="grpT">${s.grp}</div>`:''}<div class="step ${i===cur?'active':i<cur?'done':''}" data-i="${i}"><div class="no">${i<cur?'✓':i+1}</div><div>${s.title}</div></div>`).join('');
+  stepsEl.querySelectorAll('.step').forEach(e=>e.onclick=()=>go(+e.dataset.i)); bar.style.width=((cur+1)/SCENES.length*100)+'%'; }
+async function runScene(i){ const tk=++token; cur=i; renderSteps(); const s=SCENES[i]; wt.textContent=s.win; page.innerHTML=`<div class="scene">${s.html}</div>`;
+  cap.innerHTML=`<span class="tag">第 ${i+1}/${SCENES.length} 步</span>`; cursor.style.left='60%'; cursor.style.top='75%';
+  try { await sleep(500); await waitPlay(tk);
+    for(const a of s.acts){
+      if(a.s) cap.innerHTML=`<span class="tag">第 ${i+1}/${SCENES.length} 步</span>${a.s}`;
+      if(a.w) await sleep(a.w);
+      if(a.c) await click(q(a.c),tk);
+      if(a.f) a.f();
+      await waitPlay(tk);
+    }
+    await sleep(2400); await waitPlay(tk);
+    if(i<SCENES.length-1) runScene(i+1); else stepsEl.querySelectorAll('.step').forEach(e=>e.classList.add('done'));
+  } catch(e) { /* 被跳转打断 */ } }
+function go(i){ paused=false; q('#play').textContent='⏸ 暂停'; runScene(Math.max(0,Math.min(SCENES.length-1,i))); }
+q('#prev').onclick=()=>go(cur-1);
+q('#next').onclick=()=>go(cur+1);
+q('#replay').onclick=()=>go(cur);
+q('#play').onclick=e=>{ paused=!paused; e.target.textContent=paused?'▶ 继续':'⏸ 暂停'; };
+runScene(0);
+</script>
+</body>
+</html>

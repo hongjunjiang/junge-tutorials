@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>自动匹配 · 动画教程</title>
+<style>
+:root { --bg:#0b1020; --panel:#121a33; --line:#24305a; --text:#e8ecff; --dim:#8a94c0; --blue:#3b6cff; --cyan:#22d3ee; --ok:#22c55e; --warn:#f59e0b; --jy:#14161c; --jy2:#1d2029; --jyline:#2c303b; }
+* { box-sizing:border-box; margin:0; padding:0; }
+body { font-family:'Microsoft YaHei','PingFang SC',sans-serif; background:radial-gradient(1200px 600px at 70% -10%, #1d2b66 0%, var(--bg) 60%); color:var(--text); min-height:100vh; display:flex; flex-direction:column; align-items:center; padding:28px 20px; }
+h1 { font-size:26px; letter-spacing:1px; } h1 span { background:linear-gradient(90deg,var(--cyan),var(--blue)); -webkit-background-clip:text; color:transparent; }
+.sub { color:var(--dim); margin:8px 0 22px; font-size:14px; }
+.wrap { display:flex; gap:22px; width:min(1240px,100%); }
+.steps { width:250px; flex-shrink:0; background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:14px; height:fit-content; }
+.grpT { font-size:12px; color:var(--warn); padding:8px 10px 4px; letter-spacing:1px; }
+.step { display:flex; gap:10px; align-items:flex-start; padding:9px 10px; border-radius:10px; cursor:pointer; color:var(--dim); transition:.25s; font-size:14px; line-height:1.4; }
+.step .no { width:26px; height:26px; border-radius:50%; border:2px solid var(--line); display:flex; align-items:center; justify-content:center; font-size:13px; flex-shrink:0; transition:.25s; }
+.step.active { background:rgba(59,108,255,.15); color:var(--text); }
+.step.active .no { border-color:var(--blue); background:var(--blue); color:#fff; box-shadow:0 0 14px var(--blue); }
+.step.done .no { border-color:var(--ok); background:var(--ok); color:#fff; } .step.done { color:#b7c0e6; }
+.stage { flex:1; min-width:0; }
+.win { border-radius:14px; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,.45); border:1px solid #2b376b; position:relative; background:#0d1117; }
+.bar { background:#1b1f27; padding:9px 14px; display:flex; align-items:center; gap:10px; color:#9aa3b8; font-size:13px; }
+.dots i { display:inline-block; width:11px; height:11px; border-radius:50%; margin-right:6px; }
+.dots i:nth-child(1){background:#ff5f57}.dots i:nth-child(2){background:#febc2e}.dots i:nth-child(3){background:#28c840}
+.page { height:560px; position:relative; overflow:hidden; font-size:13px; }
+.page > .scene { position:absolute; inset:0; animation:fadeIn .45s ease; }
+@keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+#cursor { position:absolute; left:60%; top:75%; width:22px; height:22px; z-index:50; pointer-events:none; transition:left .9s cubic-bezier(.6,.05,.3,1), top .9s cubic-bezier(.6,.05,.3,1); filter:drop-shadow(0 2px 3px rgba(0,0,0,.5)); }
+.ripple { position:absolute; width:14px; height:14px; border-radius:50%; border:3px solid var(--cyan); z-index:49; pointer-events:none; animation:rip .6s ease-out forwards; }
+@keyframes rip { from { transform:translate(-50%,-50%) scale(.4); opacity:1; } to { transform:translate(-50%,-50%) scale(3.2); opacity:0; } }
+.pressed { transform:scale(.94); filter:brightness(.9); } .glow { box-shadow:0 0 0 2px rgba(34,211,238,.7), 0 0 20px rgba(34,211,238,.6) !important; }
+.caption { margin-top:16px; background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:14px 18px; min-height:78px; font-size:15px; line-height:1.7; }
+.caption .tag { display:inline-block; background:var(--blue); color:#fff; border-radius:6px; padding:0 8px; font-size:12px; margin-right:8px; }
+.caption .warn { color:var(--warn); }
+.ctrl { margin-top:14px; display:flex; gap:10px; align-items:center; }
+.ctrl button { background:var(--panel); color:var(--text); border:1px solid var(--line); border-radius:9px; padding:8px 16px; cursor:pointer; font-size:14px; font-family:inherit; }
+.ctrl button:hover { border-color:var(--blue); } .ctrl button.pri { background:var(--blue); border-color:var(--blue); }
+.prog { flex:1; height:6px; background:var(--line); border-radius:3px; overflow:hidden; } .prog i { display:block; height:100%; width:0; background:linear-gradient(90deg,var(--cyan),var(--blue)); transition:width .5s; }
+.tips { width:min(1240px,100%); margin-top:22px; display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+.tip { background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:14px 16px; font-size:13px; line-height:1.7; color:#c3cbef; } .tip b { color:var(--warn); display:block; margin-bottom:4px; font-size:14px; }
+.toast { position:absolute; left:50%; top:54px; transform:translateX(-50%); background:#16a34a; color:#fff; padding:8px 18px; border-radius:8px; font-size:14px; z-index:20; animation:fadeIn .3s; }
+
+/* ===== 剪映 ===== */
+.jy { position:absolute; inset:0; background:var(--jy); color:#d6d9e0; }
+.jyTop { height:38px; background:var(--jy2); border-bottom:1px solid var(--jyline); display:flex; align-items:center; gap:4px; padding:0 10px; }
+.jyTab { padding:6px 12px; border-radius:6px; color:#aab0bd; } .jyTab.on { background:#2a2e39; color:#fff; }
+.jyLib { position:absolute; left:0; top:38px; width:280px; height:260px; border-right:1px solid var(--jyline); padding:12px; display:flex; gap:10px; align-content:flex-start; flex-wrap:wrap; }
+.thumb { width:118px; height:68px; border-radius:6px; position:relative; display:inline-block; } .thumb span { position:absolute; left:6px; bottom:4px; font-size:11px; color:#fff; text-shadow:0 1px 2px #000; }
+.thumb.hot { background:linear-gradient(135deg,#7a2f4f,#c2410c); } .thumb.raw { background:linear-gradient(135deg,#3b2f5c,#1f4b6e); }
+.jyPrev { position:absolute; left:280px; right:0; top:38px; height:260px; display:flex; align-items:center; justify-content:center; gap:14px; }
+.screen { width:300px; height:170px; background:linear-gradient(160deg,#2c3a55,#0f1420); border-radius:4px; position:relative; display:flex; align-items:flex-end; justify-content:center; padding-bottom:10px; color:#fff; font-size:14px; }
+.screen .lb { position:absolute; left:8px; top:6px; font-size:11px; background:rgba(0,0,0,.55); padding:1px 6px; border-radius:4px; }
+.jyTool { position:absolute; left:0; right:0; top:298px; height:34px; background:var(--jy2); border-top:1px solid var(--jyline); border-bottom:1px solid var(--jyline); display:flex; align-items:center; gap:14px; padding:0 14px; color:#aab0bd; } .jyTool span { padding:4px 8px; border-radius:5px; }
+.tl { position:absolute; left:0; right:0; top:332px; bottom:0; padding:14px 14px 0 84px; }
+.tlLabel { position:absolute; left:12px; font-size:11px; color:#7c8394; }
+.track { height:30px; border-radius:4px; margin-bottom:10px; display:flex; overflow:hidden; } .track.sub { height:20px; }
+.seg { height:100%; border-right:2px solid var(--jy); flex:none; animation:fadeIn .25s; }
+.seg.h { background:linear-gradient(180deg,#c2410c,#7a2f4f); } .seg.r { background:linear-gradient(180deg,#2e6e8e,#1e4f68); }
+.sbox { height:100%; background:#8a5cf6; border-right:2px solid var(--jy); border-radius:3px; flex:none; animation:fadeIn .25s; }
+.jyBtn { background:#00c8d6; color:#05252a; border-radius:6px; padding:7px 16px; font-weight:bold; display:inline-block; }
+.ctxMenu { position:absolute; background:#2a2e39; border:1px solid #3a3f4c; border-radius:6px; padding:4px 0; width:130px; z-index:10; animation:fadeIn .2s; } .ctxMenu div { padding:6px 14px; color:#d6d9e0; } .ctxMenu div.hl { background:#3b4252; }
+
+/* ===== 软件（按真实界面配色 dark_blue） ===== */
+.app { position:absolute; inset:0; background:#0a0e14; color:#e6edf3; display:flex; font-size:13px; }
+.side { width:200px; background:#0d1117; border-right:1px solid #30363d; flex-shrink:0; }
+.verTabs { display:flex; gap:8px; padding:12px 12px; border-bottom:1px solid #30363d; }
+.verTabs span { flex:1; text-align:center; padding:8px 0; border-radius:7px; background:#161b22; border:2px solid transparent; color:#7d8590; font-weight:bold; font-size:13px; }
+.verTabs span.on { border-color:#1f6feb; color:#58a6ff; background:#0d1a2e; }
+.nav { padding:11px 16px; display:flex; align-items:center; gap:10px; border-left:3px solid transparent; color:#e6edf3; }
+.nav .ar { margin-left:auto; color:#7d8590; font-size:11px; }
+.nav.on { background:linear-gradient(90deg,rgba(31,111,235,.2),transparent); border-left-color:#1f6feb; color:#1f6feb; }
+.main { flex:1; overflow:hidden; position:relative; }
+#am { position:relative; padding:18px 26px 40px; transition:transform .7s cubic-bezier(.5,.05,.3,1); }
+.secT { display:flex; align-items:center; gap:10px; font-size:16px; font-weight:bold; margin-bottom:14px; }
+.secT .ic { background:#161b22; padding:4px 7px; border-radius:5px; } .cfg { background:#161b22; border:1px solid #30363d; border-radius:4px; padding:3px 9px; font-size:12px; }
+.card { background:#161b22; border:1px solid #30363d; border-radius:10px; margin-bottom:12px; }
+.card.pad { padding:14px 20px; }
+.cardT { font-weight:bold; font-size:14px; padding-bottom:9px; margin-bottom:11px; border-bottom:1px solid #30363d; }
+.sum { padding:11px 20px; display:flex; align-items:center; gap:7px; color:#7d8590; font-size:13px; }
+.sum.inline { padding:10px 0 0; }
+.sum .arr { font-size:10px; transition:transform .2s; display:inline-block; } .sum.open .arr { transform:rotate(90deg); }
+.sum b { color:#e6edf3; font-size:14px; }
+.det { display:none; padding:0 20px 12px; } .det.in { padding:10px 0 0; } .det.open { display:block; animation:fadeIn .3s; }
+.rgrid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.ro { display:flex; gap:7px; align-items:flex-start; color:#7d8590; margin-bottom:6px; line-height:1.5; }
+.ro input { accent-color:#1f6feb; width:14px; height:14px; margin-top:2px; flex:none; }
+.ro input:checked + span { color:#e6edf3; } .ro .lb { font-weight:bold; color:#e6edf3; } .ro .ds { color:#7d8590; font-size:12px; }
+.sel { display:inline-block; background:#21262d; border:1px solid #30363d; border-radius:6px; padding:5px 12px; margin-top:4px; }
+.hr { border-top:1px solid #30363d; margin:16px 0; }
+.dHead { display:flex; align-items:center; } .dHead b { font-size:14px; } .dHead .hint { color:#7d8590; font-size:12px; margin-left:10px; }
+.dHead .lk { color:#58a6ff; font-size:12px; margin-left:12px; }
+.srcRow { display:flex; gap:16px; align-items:center; color:#7d8590; margin:10px 0 12px; } .srcRow .ro { margin:0; }
+.dgrid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+.dcard { background:#161b22; border:2px solid #30363d; border-radius:6px; padding:10px; text-align:center; transition:.2s; }
+.dcard.selected { border-color:#1f6feb; background:rgba(31,111,235,.15); }
+.dcard .n { font-weight:bold; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; } .dcard .c { color:#7d8590; font-size:11px; margin:2px 0 4px; } .dcard .t { color:#7d8590; font-size:10px; line-height:1.5; }
+.acts { display:flex; gap:12px; } .btnP { background:#1f6feb; color:#fff; border-radius:6px; padding:9px 22px; font-weight:bold; display:inline-block; } .btnD { background:#f85149; color:#fff; border-radius:6px; padding:9px 22px; font-weight:bold; display:inline-block; opacity:.45; } .btnD.on { opacity:1; }
+.pbar { height:22px; background:#21262d; border:1px solid #30363d; border-radius:11px; overflow:hidden; position:relative; margin:16px 0 10px; }
+.pbar i { display:block; height:100%; width:0; background:linear-gradient(90deg,#1f6feb,#388bfd); transition:width .5s; }
+.pbar span { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:bold; }
+.logbox { background:#161b22; border:1px solid #30363d; border-radius:6px; height:210px; padding:10px 12px; font-family:Consolas,'Microsoft YaHei',monospace; font-size:12px; line-height:1.75; color:#9da7b3; overflow:hidden; } .logbox .ok { color:#3fb950; }
+.status { color:#7d8590; font-size:12px; margin-top:6px; }
+</style>
+</head>
+<body>
+<a href="index.html" style="position:fixed;left:18px;top:14px;color:#8a94c0;font-size:13px;text-decoration:none;border:1px solid #24305a;border-radius:8px;padding:5px 12px;background:#121a33;z-index:99">← 教程首页</a>
+<h1>🎬 <span>自动匹配</span> 动画教程</h1>
+<div class="sub">爆款解说视频 + 电影原片 → 软件逐段找到原片里相同的画面 → 自动放到剪映副轨道　｜　自动播放，点左侧步骤可跳转</div>
+<div class="wrap">
+  <div class="steps" id="steps"></div>
+  <div class="stage">
+    <div class="win">
+      <div class="bar"><div class="dots"><i></i><i></i><i></i></div><span id="wtitle"></span></div>
+      <div class="page" id="page"></div>
+      <svg id="cursor" viewBox="0 0 24 24"><path d="M3 2l7 19 2.6-7.4L20 11z" fill="#fff" stroke="#111" stroke-width="1.6" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="caption" id="caption"></div>
+    <div class="ctrl"><button id="prev">⏮ 上一步</button><button id="play" class="pri">⏸ 暂停</button><button id="next">下一步 ⏭</button><button id="replay">🔁 重播本步</button><div class="prog"><i id="bar"></i></div></div>
+  </div>
+</div>
+<div class="tips">
+  <div class="tip"><b>🎞️ 轨道别放反</b>爆款视频放主轨道，电影原片放主轨道上方的副轨道。匹配后副轨道的整条原片会换成一段段对应画面。</div>
+  <div class="tip"><b>📝 先识别字幕，再智能分割</b>爆款要先识别字幕，再做智能镜头分割。顺序反了，识别出来的字幕会断断续续。</div>
+  <div class="tip"><b>✂️ 原片什么时候也要分割</b>选「裁剪边缘，轻微减速」防闪帧，或开启全场景（后面做 AI智能重选要用）时，副轨道的原片也要做智能镜头分割。</div>
+  <div class="tip"><b>⚖️ 快速还是稳定</b>横屏视频用「快速」；竖屏或带黑边、画中画的爆款匹配不准时，换「稳定」再跑一次。</div>
+  <div class="tip"><b>⚡ 同一部电影再匹配更快</b>高级选项里「素材特征缓存」默认开着。原片特征提取一次后会缓存，下次同一部电影跳过提取。</div>
+  <div class="tip"><b>📦 批量匹配</b>本地草稿可以多选。高级选项里把「系统性能」并行任务数调到 2 以上，多个草稿同时跑。</div>
+</div>
+<script>
+// ===== 公共数据 =====
+const CUTS = [3.2,2.1,4.4,1.8,2.9,3.6,2.4,1.6,3.9,2.7,2.2,4.1,1.9,3.3,2.6,3.0,2.0,3.8,2.5,1.7,3.4,2.8,2.3,3.1,2.0,3.5];
+const SUM = CUTS.reduce((a,b)=>a+b,0);
+const W = c => (c/SUM*100).toFixed(2)+'%';
+
+// ===== 剪映界面 =====
+const JY = (tool, extra='') => `<div class="jy">
+  <div class="jyTop"><span class="jyTab on">媒体</span><span class="jyTab">音频</span><span class="jyTab">文本</span><span class="jyTab">贴纸</span><span class="jyTab">特效</span><span style="margin-left:auto;color:#7c8394">剪映专业版 · 惊魂模特_爆款</span></div>
+  <div class="jyLib"><div class="thumb hot" id="hot"><span>爆款解说.mp4</span></div><div class="thumb raw" id="raw"><span>惊魂模特_原片.mp4</span></div>
+    <div id="libNote" style="width:100%;color:#7c8394;font-size:12px;line-height:1.6"></div></div>
+  <div class="jyPrev"><div class="screen" id="screen">播放器</div></div>
+  <div class="jyTool">${tool || '<span>↶</span><span>↷</span><span>✂ 分割</span><span>🗑</span>'}</div>
+  <div class="tl">
+    <div class="tlLabel" style="top:16px">字幕</div><div class="track sub" id="st"></div>
+    <div class="tlLabel" style="top:50px">副轨道</div><div class="track" id="ot" style="width:0;background:linear-gradient(180deg,#2e6e8e,#1e4f68)"></div>
+    <div class="tlLabel" style="top:90px">主轨道</div><div class="track" id="vt" style="width:0;background:#7a2f4f"></div>
+  </div>${extra}</div>`;
+
+// ===== 软件界面（照真实「自动匹配」页还原） =====
+const NAV = [['⚙️','初始化'],['🎬','自动匹配（主功能）','on','navMatch'],['✏️','文案改写',1],['🎤','配音',1],['📐','对齐',1],['🔀','去重',1],['🧠','智能原创',1],['🏎️','一键全自动'],['🧰','实用功能',1],['⚙️','软件设置'],['🔑','激活软件']];
+function SIDE(matchOn){ return `<div class="side"><div class="verTabs"><span class="on" id="tabJy">✂️ 剪映版</span><span>🎬 PR版</span></div>
+  ${NAV.map(n=>`<div class="nav ${n[2]==='on'&&matchOn?'on':''}" ${n[3]?`id="${n[3]}"`:''}><span>${n[0]}</span><span>${n[1]}</span>${n[2]===1?'<span class="ar">▶</span>':''}</div>`).join('')}</div>`; }
+const DRAFTS = [['惊魂模特_爆款','186','2026/11/12 14:21:08','dTarget'],['智能解说_11月11日_1803','813','2026/11/11 18:04:38'],['智能解说_11月11日_1745','819','2026/11/11 17:50:22'],
+  ['智能快剪_11月11日_1729','104','2026/11/11 17:46:28'],['11月11日 (1)','240','2026/11/11 17:29:37'],['11月11日','339','2026/11/11 16:40:44']];
+function MATCHPAGE(){ return `<div class="secT"><span class="ic">⚙️</span>设置<span class="cfg">💾</span><span class="cfg">📂</span></div>
+  <div class="card pad"><div class="cardT">匹配模型</div>
+    <div class="rgrid"><label class="ro"><input type="radio" name="mt" id="mFast" checked><span><span class="lb">快速</span> <span class="ds">(此模型推荐使用横屏视频)</span></span></label>
+      <label class="ro"><input type="radio" name="mt" id="mStable"><span><span class="lb">稳定</span> <span class="ds">(竖屏不准可切换稳定模型)</span></span></label></div>
+    <div class="sum inline" id="sParam"><span class="arr">▶</span> 匹配参数</div>
+    <div class="det in" id="dParam">
+      <div class="rgrid"><label class="ro"><input type="radio" name="sp"><span><span class="lb">慢速（推荐）</span> <span class="ds">(隔4帧采样，精细匹配)</span></span></label>
+        <label class="ro"><input type="radio" name="sp" checked><span><span class="lb">快速</span> <span class="ds">(隔8帧采样，长片加速)</span></span></label></div>
+      <div style="margin-top:8px">匹配算法<br><span class="sel">[ 智能算法 ] ▾</span> <span class="ds" style="color:#7d8590;font-size:12px">　自动检测视频类型，无需手动选择</span></div>
+      <label class="ro" style="margin-top:10px"><input type="checkbox" checked><span><span class="lb">匹配前帧率检测</span> <span class="ds">(检测变帧率素材，仅提示不改文件)</span></span></label>
+    </div></div>
+  <div class="card"><div class="sum" id="sFlash"><span class="arr">▶</span> <b>防闪帧与全场景</b></div>
+    <div class="det" id="dFlash">
+      <label class="ro"><input type="radio" name="af" id="afNone" checked><span><span class="lb">不做裁剪，保持原速</span> <span class="ds">- 仅主轨道智能分割，防闪帧不生效。</span></span></label>
+      <label class="ro" id="afCrop"><input type="radio" name="af"><span><span class="lb">裁剪边缘，轻微减速</span> <span class="ds">- 主副轨道均需智能镜头分割。</span></span></label>
+      <label class="ro"><input type="radio" name="af"><span><span class="lb">新版防闪帧</span> <span class="ds">- 速度快，无需分割，适合1-3分钟短片。</span></span></label>
+      <div style="border-top:1px solid #30363d;margin-top:8px;padding-top:8px">全场景 <span class="ds" style="color:#7d8590;font-size:12px">- 将匹配到的原片场景全时长片段额外放在第三轨道作为参考</span></div>
+      <label class="ro" style="margin-top:6px"><input type="radio" name="ws" id="wsNo" checked><span>否，不需要第三轨道</span></label>
+      <label class="ro" id="wsWhole"><input type="radio" name="ws"><span><span class="lb">是，延长展示全场景</span> <span class="ds">- 主副轨道均需智能镜头分割。</span></span></label>
+      <label class="ro"><input type="radio" name="ws"><span>是，延长展示更多场景，至多不超过 <span class="sel" style="margin:0;padding:1px 8px">3.0 ▾</span> 倍时长 <span class="ds">- 主副轨道均需智能镜头分割。</span></span></label>
+    </div></div>
+  <div class="card"><div class="sum"><span class="arr">▶</span> <b>高级选项</b></div></div>
+  <div class="hr"></div>
+  <div id="drafts"><div class="dHead"><b>本地草稿</b><span class="hint">选择一个或多个草稿，然后向下卷动此页面</span><span id="refresh" style="margin-left:10px;background:#1f6feb;border-radius:4px;padding:0 4px;font-size:12px">🔄</span>
+      <span style="margin-left:auto"></span><span class="lk">显示更多</span><span class="lk">展开所有</span><span class="lk">全选</span></div>
+    <div class="srcRow">草稿来源: <label class="ro"><input type="radio" name="src" checked><span>剪映</span></label><label class="ro"><input type="radio" name="src"><span>CapCut (剪映国际版)</span></label></div>
+    <div class="dgrid" id="dgrid">${DRAFTS.map(d=>`<div class="dcard" ${d[3]?`id="${d[3]}"`:''}><div class="n">${d[0]}</div><div class="c">${d[1]} 个片段</div><div class="t">最近编辑:<br>${d[2]}</div></div>`).join('')}</div></div>
+  <div class="hr"></div>
+  <div id="actions"><div class="acts"><span class="btnP" id="start">🚀 开始匹配</span><span class="btnD" id="stop">⏹ 停止</span></div>
+    <div class="pbar"><i id="pb"></i><span id="pt">0%</span></div>
+    <div class="logbox" id="log"></div><div class="status" id="status">就绪</div></div>`; }
+const APP = (matchOn=true) => `<div class="app">${SIDE(matchOn)}<div class="main"><div id="am">${matchOn?MATCHPAGE():`<div class="secT"><span class="ic">⚙️</span>初始化</div><div class="card pad" style="color:#7d8590;line-height:2">剪映草稿目录：E:\\剪映草稿\\JianyingPro Presets\\JianyingPro Drafts<br>✅ 已扫描到 6 个草稿</div>`}</div></div></div>`;
+
+// ===== 场景 =====
+const SCENES = [
+{ grp:'第一部分 · 剪映里准备', title:'新建草稿，放爆款 + 导入原片', win:'剪映专业版 · 新建草稿',
+  html: JY(),
+  acts:[{s:'剪映新建草稿，把 <b>爆款解说视频</b> 和 <b>电影原片</b> 都导入素材库。'},{w:1200},
+        {s:'把 <b>爆款视频</b> 拖到 <b>主轨道</b>（最下面那条）。'},{c:'#hot',f:()=>{const v=q('#vt'); v.style.transition='width .9s'; v.style.width='100%'; q('#screen').textContent='爆款解说画面';}},{w:1200},
+        {s:'再把 <b>电影原片</b> 拖到主轨道上方的 <b>副轨道</b>。软件匹配时从副轨道读取原片，再把匹配到的画面写回副轨道。'},{c:'#raw',f:()=>{const o=q('#ot'); o.style.transition='width .9s'; o.style.width='100%'; q('#libNote').innerHTML='爆款 → 主轨道<br>原片 → 副轨道';}},{w:1600}] },
+
+{ title:'先识别字幕，再智能分割爆款', win:'剪映专业版 · 惊魂模特_爆款',
+  html: JY('<span>↶</span><span>↷</span><span>✂ 分割</span><span>🗑</span><span id="smart" style="background:#2a2e39;color:#00c8d6">🪄 智能镜头分割</span>'),
+  acts:[{f:()=>{const v=q('#vt'); v.style.width='100%'; q('#ot').style.width='100%'; q('#screen').textContent='爆款解说画面';}},
+        {s:'<b>第一步先识别字幕</b>：右键主轨道的爆款视频 → <b>识别字幕</b>，等字幕出来。'},{c:'#vt',f:showCtx},{w:700},{c:'#ctxSub',f:()=>{q('.ctxMenu')?.remove(); const st=q('#st'); let k=0; const t=setInterval(()=>{ if(!document.body.contains(st)) return clearInterval(t); st.insertAdjacentHTML('beforeend',`<div class="sbox" style="width:${(100/9).toFixed(2)}%"></div>`); if(++k>=9) clearInterval(t); },120);}},{w:1600},
+        {s:'<b>字幕出来后，再对爆款做智能镜头分割</b>：按镜头切成一段一段，软件按段去原片里找画面。<span class="warn">顺序别反：先分割再识别字幕，字幕会断断续续。（按钮位置以你的剪映版本为准）</span>'},
+        {c:'#smart',f:()=>{const v=q('#vt'); v.innerHTML=''; v.style.background='none'; CUTS.forEach((c,k)=>setTimeout(()=>{ if(document.body.contains(v)) v.insertAdjacentHTML('beforeend',`<div class="seg h" style="width:${W(c)}"></div>`); },k*55));}},{w:2600},
+        {s:'草稿会自动保存。<b>关掉剪映</b>（剪映开着时软件写入的结果可能被覆盖）。'},{f:()=>toast('✅ 草稿已保存')},{w:1500}] },
+
+{ grp:'第二部分 · 软件里匹配', title:'进入「自动匹配」页', win:'军哥团队智能匹配软件',
+  html: APP(false),
+  acts:[{s:'打开软件，左上角确认是 <b>✂️ 剪映版</b>（用 PR 的切到 PR版）。'},{c:'#tabJy'},
+        {s:'左侧点 <b>🎬 自动匹配（主功能）</b>。'},{c:'#navMatch',f:()=>{ q('#navMatch').classList.add('on'); q('#am').innerHTML=MATCHPAGE(); }},{w:1400}] },
+
+{ title:'选匹配模型', win:'军哥团队智能匹配软件 · 自动匹配',
+  html: APP(),
+  acts:[{s:'<b>匹配模型</b>：横屏视频选 <b>快速</b>（默认）。竖屏视频、或者快速模型匹配不准时，换 <b>稳定</b>。'},{c:'#mStable',f:()=>{q('#mStable').checked=true;}},{w:700},{c:'#mFast',f:()=>{q('#mFast').checked=true;}},
+        {s:'点 <b>▶ 匹配参数</b> 可以看采样速度和算法。<b>一般不用改</b>：算法默认「智能算法」会自动判断视频类型；长片用「快速」采样，想更精细选「慢速」。'},{c:'#sParam',f:()=>openDet('#sParam','#dParam')},{w:2600}] },
+
+{ title:'防闪帧与全场景', win:'军哥团队智能匹配软件 · 自动匹配',
+  html: APP(),
+  acts:[{s:'展开 <b>防闪帧与全场景</b>。新手保持默认 <b>「不做裁剪，保持原速」</b> 和 <b>「否，不需要第三轨道」</b>，这时只需要爆款做了智能分割。'},{c:'#sFlash',f:()=>{ openDet('#sFlash','#dFlash'); setTimeout(()=>scrollTo('#sFlash'),350); }},{w:2400},
+        {s:'想用第二种防闪帧 <b>「裁剪边缘，轻微减速」</b>：<span class="warn">副轨道的原片也要在剪映里做智能镜头分割</span>（主副轨道都要分割）。'},{c:'#afCrop',f:()=>{q('#afCrop input').checked=true;}},{w:2600},
+        {s:'想开 <b>全场景</b>（第三轨道放原片完整场景，后面做 <b>AI智能重选</b> 要用）：<span class="warn">同样要先把副轨道原片也做智能镜头分割</span>。'},{c:'#wsWhole',f:()=>{q('#wsWhole input').checked=true;}},{w:2800},
+        {s:'只是 1~3 分钟短片怕闪帧，选 <b>新版防闪帧</b> 就行，不用分割原片。<b>新手先用默认</b>，跑通了再试这些选项。'},{f:()=>{q('#afNone').checked=true; q('#wsNo').checked=true;}},{w:2600}] },
+
+{ title:'选择草稿', win:'军哥团队智能匹配软件 · 自动匹配',
+  html: APP(),
+  acts:[{s:'往下翻到 <b>本地草稿</b>，草稿来源选 <b>剪映</b>，点 <b>🔄</b> 刷新，刚才保存的草稿就会出现。'},{f:()=>scrollTo('#drafts')},{w:900},{c:'#refresh'},
+        {s:'点一下草稿卡片选中（边框变蓝）。<b>可以多选</b>，一次匹配多个草稿。'},{c:'#dTarget',f:()=>q('#dTarget').classList.add('selected')},{w:1400}] },
+
+{ title:'开始匹配', win:'军哥团队智能匹配软件 · 匹配中',
+  html: APP(),
+  acts:[{f:()=>{ q('#dTarget').classList.add('selected'); scrollTo('#actions'); }},{w:900},
+        {s:'点 <b>🚀 开始匹配</b>。软件会：检测帧率 → 提取原片特征 → 爆款逐段和原片比对 → 把找到的原片片段写进草稿副轨道。'},{c:'#start',f:runLog},{w:7600},
+        {s:'第一次匹配某部电影要提取特征，耗时和片长有关；<b>同一部电影再匹配会读缓存</b>，快很多。中途要停点 <b>⏹ 停止</b>。'},{w:1600}] },
+
+{ grp:'第三部分 · 看成品', title:'回剪映看副轨道', win:'剪映专业版 · 惊魂模特_爆款',
+  html:`<div class="jy">
+    <div class="jyTop"><span class="jyTab on">媒体</span><span class="jyTab">音频</span><span class="jyTab">文本</span><span style="margin-left:auto"><span class="jyBtn" id="export">导出</span></span></div>
+    <div class="jyPrev" style="left:0"><div class="screen" id="s1" style="width:300px"><span class="lb">主轨道 · 爆款</span></div><div class="screen" id="s2" style="width:300px"><span class="lb">副轨道 · 原片</span></div></div>
+    <div class="jyTool"><span>↶</span><span>↷</span><span>✂ 分割</span><span>🗑</span></div>
+    <div class="tl">
+      <div class="tlLabel" style="top:16px">字幕</div><div class="track sub" id="r0"></div>
+      <div class="tlLabel" style="top:50px">副轨道(原片)</div><div class="track" id="r1"></div>
+      <div class="tlLabel" style="top:90px">主轨道(爆款)</div><div class="track" id="r2"></div></div></div>`,
+  acts:[{f:buildResult},{s:'打开剪映里的这个草稿：<b>副轨道</b>原来的整条原片，已经换成和爆款每一段对应的原片画面，时长一一对齐。'},{w:2400},
+        {s:'默认「生成并列预览」，主副画面缩小并排，方便逐段核对。个别段不准可以手动换，或用 <b>AI智能重选</b>；检查完就可以继续改写、配音、去重，最后 <b>导出</b>。🎉'},{w:2600},{c:'#export',f:()=>toast('✅ 导出中...')},{w:1500}] },
+];
+
+// ===== 动作函数 =====
+const q = s => document.querySelector(s);
+function toast(msg){ const t=document.createElement('div'); t.className='toast'; t.textContent=msg; q('#page').appendChild(t); setTimeout(()=>t.remove(),1600); }
+function openDet(s,d){ q(s).classList.add('open'); q(d).classList.add('open'); }
+function scrollTo(sel){ const el=q(sel); q('#am').style.transform=`translateY(-${el.offsetTop-14}px)`; }
+function showCtx(){ const m=document.createElement('div'); m.className='ctxMenu'; m.style.left='300px'; m.style.top='400px';
+  m.innerHTML='<div>复制</div><div>分离音频</div><div id="ctxSub" class="hl">识别字幕</div><div>删除</div>'; q('.jy').appendChild(m); }
+function runLog(){
+  const L=['[匹配] 草稿：惊魂模特_爆款（186 个片段）','[检测] 主轨道爆款 1920×1080，横屏 → 快速模型','[帧率] 爆款 30fps / 原片 23.976fps，均为固定帧率 ✓','1 个素材视频，逐个提取特征...','[特征] 惊魂模特_原片.mp4 提取中（隔8帧采样）','[缓存] 原片特征已缓存，同一电影再次匹配更快','✅ 开始匹配...','[匹配] 186/186 段完成','[写入] 副轨道写入 186 个原片片段，生成并列预览','<span class="ok">✅ 匹配完成！回到剪映打开草稿查看</span>'];
+  const log=q('#log'), pb=q('#pb'), pt=q('#pt'), st=q('#status'); q('#stop').classList.add('on'); st.textContent='匹配中...'; let i=0;
+  const t=setInterval(()=>{ if(!document.body.contains(log)) return clearInterval(t);
+    log.insertAdjacentHTML('beforeend',L[i]+'<br>'); const p=Math.round((i+1)/L.length*100); pb.style.width=p+'%'; pt.textContent=p+'%';
+    if(++i>=L.length){ clearInterval(t); st.textContent='完成'; q('#stop').classList.remove('on'); } },700); }
+function buildResult(){
+  const r0=q('#r0'), r1=q('#r1'), r2=q('#r2');
+  CUTS.forEach((c,k)=>{ r2.insertAdjacentHTML('beforeend',`<div class="seg h" style="width:${W(c)}"></div>`);
+    setTimeout(()=>{ if(document.body.contains(r1)) r1.insertAdjacentHTML('beforeend',`<div class="seg r" style="width:${W(c)}"></div>`); },300+k*70); });
+  for(let k=0;k<9;k++) r0.insertAdjacentHTML('beforeend',`<div class="sbox" style="width:${(100/9).toFixed(2)}%"></div>`);
+  const s1=q('#s1'), s2=q('#s2'); let k=0;
+  const t=setInterval(()=>{ if(!document.body.contains(s1)) return clearInterval(t); k++;
+    s1.lastChild.textContent=s2.lastChild.textContent='镜头 '+(k%CUTS.length+1); },1100);
+  s1.append(document.createTextNode('镜头 1')); s2.append(document.createTextNode('镜头 1')); }
+
+// ===== 播放引擎 =====
+const page=q('#page'), cursor=q('#cursor'), cap=q('#caption'), wt=q('#wtitle'), stepsEl=q('#steps'), bar=q('#bar');
+let cur=0, paused=false, token=0;
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+async function waitPlay(tk){ while(paused){ await sleep(100); if(tk!==token) throw 0; } if(tk!==token) throw 0; }
+function center(el){ const b=q('.win').getBoundingClientRect(), r=el.getBoundingClientRect(); return [r.left-b.left+Math.min(r.width/2,60), r.top-b.top+r.height/2]; }
+async function moveTo(el,tk){ const [x,y]=center(el); cursor.style.left=(x-4)+'px'; cursor.style.top=(y-2)+'px'; await sleep(950); await waitPlay(tk); }
+async function click(el,tk){ el.classList.add('glow'); await moveTo(el,tk); const [x,y]=center(el); const r=document.createElement('div'); r.className='ripple'; r.style.left=x+'px'; r.style.top=y+'px'; q('.win').appendChild(r); setTimeout(()=>r.remove(),650);
+  el.classList.add('pressed'); await sleep(180); el.classList.remove('pressed','glow'); await sleep(250); }
+function renderSteps(){ stepsEl.innerHTML=SCENES.map((s,i)=>`${s.grp?`<div class="grpT">${s.grp}</div>`:''}<div class="step ${i===cur?'active':i<cur?'done':''}" data-i="${i}"><div class="no">${i<cur?'✓':i+1}</div><div>${s.title}</div></div>`).join('');
+  stepsEl.querySelectorAll('.step').forEach(e=>e.onclick=()=>go(+e.dataset.i)); bar.style.width=((cur+1)/SCENES.length*100)+'%'; }
+async function runScene(i){ const tk=++token; cur=i; renderSteps(); const s=SCENES[i]; wt.textContent=s.win; page.innerHTML=`<div class="scene">${s.html}</div>`;
+  cap.innerHTML=`<span class="tag">第 ${i+1}/${SCENES.length} 步</span>`; cursor.style.left='60%'; cursor.style.top='75%';
+  try { await sleep(500); await waitPlay(tk);
+    for(const a of s.acts){
+      if(a.s) cap.innerHTML=`<span class="tag">第 ${i+1}/${SCENES.length} 步</span>${a.s}`;
+      if(a.w) await sleep(a.w);
+      if(a.c) await click(q(a.c),tk);
+      if(a.f) a.f();
+      await waitPlay(tk);
+    }
+    await sleep(2400); await waitPlay(tk);
+    if(i<SCENES.length-1) runScene(i+1); else stepsEl.querySelectorAll('.step').forEach(e=>e.classList.add('done'));
+  } catch(e) { /* 被跳转打断 */ } }
+function go(i){ paused=false; q('#play').textContent='⏸ 暂停'; runScene(Math.max(0,Math.min(SCENES.length-1,i))); }
+q('#prev').onclick=()=>go(cur-1);
+q('#next').onclick=()=>go(cur+1);
+q('#replay').onclick=()=>go(cur);
+q('#play').onclick=e=>{ paused=!paused; e.target.textContent=paused?'▶ 继续':'⏸ 暂停'; };
+runScene(0);
+</script>
+</body>
+</html>

@@ -96,7 +96,7 @@ h1 { font-size:26px; letter-spacing:1px; } h1 span { background:linear-gradient(
   </div>
 </div>
 <div class="tips">
-  <div class="tip"><b>📱 短剧</b>剪映里做「智能分割 + 识别字幕」，场景草稿里有字幕轨，SRT 留空。</div>
+  <div class="tip"><b>📱 短剧</b>剪映里<b>先识别字幕，再智能分割</b>（顺序反了字幕会断断续续），场景草稿里有字幕轨，SRT 留空。</div>
   <div class="tip"><b>🎞️ 影视剧</b>剪映里只做「智能分割」，台词用<b>中文 SRT</b>（和视频同一版本）。不给台词质量差很多，也不能截原声。</div>
   <div class="tip"><b>💰 省钱</b>同一部片子 + 同一个场景草稿，打过一次标就有缓存，再跑只花写文案的钱。</div>
   <div class="tip"><b>⚠️ 常见坑</b>别选 0 字节的空 SRT（会覆盖草稿字幕，原声被关掉）；识别字幕要做在<b>同一个</b>场景草稿上。</div>
@@ -108,8 +108,11 @@ const JY = (inner, tool) => `<div class="jy">
   <div class="jyLib" id="lib">${inner || '<div class="thumb" id="clip"><span>合并视频.mp4</span></div>'}</div>
   <div class="jyPrev"><div class="screen" id="screen">原片预览</div></div>
   <div class="jyTool">${tool || '<span>↶</span><span>↷</span><span>✂ 分割</span><span>🗑</span>'}</div>
-  <div class="tl"><div class="tlLabel" style="top:20px">视频</div><div class="track v" id="vt" style="width:0"></div>
-    <div class="tlLabel" style="top:60px" id="subL"></div><div class="track sub" id="st"></div></div></div>`;
+  <div class="tl"><div class="tlLabel" style="top:16px" id="subL"></div><div class="track sub" id="st"></div>
+    <div class="tlLabel" style="top:50px">视频</div><div class="track v" id="vt" style="width:0"></div></div></div>`;
+// 字幕轨：识别字幕后出现在视频轨上方（固定随机种子，重播一致）
+const SUBS = Array.from({ length: 31 }, (_, i) => [1.5 + ((i * 37) % 30) / 10, ((i * 53) % 15) / 10]);
+const subBoxes = () => SUBS.map(([w, m]) => `<div class="sbox" style="width:${w.toFixed(1)}%;flex:none;margin-right:${m.toFixed(1)}%"></div>`).join('');
 const SIDE = `<div class="appSide"><div>🎯 智能匹配</div><div>✂️ 文案粗剪</div><div class="on" id="navEfb">🎙️ 智能解说</div><div>⚡ 智能快剪</div><div>🧹 去重</div><div>⚙️ 软件设置</div></div>`;
 const segs = (n, w) => Array.from({ length: n }, () => `<div class="seg" style="width:${(w / n).toFixed(2)}%;flex:none"></div>`).join('');
 
@@ -120,18 +123,19 @@ const SCENES = [
   acts:[{s:'打开剪映专业版，<b>新建一个草稿</b>，导入要解说的原片（短剧合集、单集、整部电影都行），拖到时间线上。'},
         {c:'#clip',f:()=>{const v=document.querySelector('#vt'); v.style.transition='width .8s'; v.style.width='100%'; document.querySelector('#screen').textContent='▶ 原片';}},{w:1000}] },
 
-{ title:'智能分割：把原片切成一个个镜头', win:'剪映专业版 · 草稿「重生八零」',
-  html: JY(null, '<span>↶</span><span>↷</span><span>✂ 分割</span><span>🗑</span><span id="smart" style="background:#2a2e39;color:#00c8d6">🪄 智能分割</span>'),
-  acts:[{f:()=>{document.querySelector('#vt').style.width='100%';}},
-        {s:'选中时间线上的视频，用剪映的 <b>智能分割</b>（按镜头自动切开）。软件靠这些切点认识每个镜头：切得越准，画面配得越准。<span class="warn">（按钮位置以你的剪映版本为准）</span>'},
-        {c:'#vt'},{c:'#smart',f:()=>{const v=document.querySelector('#vt'); v.innerHTML=''; let k=0; const t=setInterval(()=>{ v.insertAdjacentHTML('beforeend',`<div class="seg" style="width:${(2+Math.random()*4).toFixed(1)}%;flex:none"></div>`); if(++k>26) clearInterval(t); },60);}},{w:2200}] },
-
-{ title:'识别字幕（短剧必做）', win:'剪映专业版 · 文本 → 智能字幕',
+{ title:'先识别字幕（短剧必做）', win:'剪映专业版 · 文本 → 智能字幕',
   html: JY(`<div style="color:#aab0bd;margin-bottom:8px">智能字幕</div><div style="background:#1d2029;border:1px solid #2c303b;border-radius:8px;padding:12px"><b>识别字幕</b><div style="color:#7c8394;font-size:12px;margin:6px 0 10px">识别视频里的人声，自动生成字幕</div><span class="jyBtn" id="recog">开始识别</span></div>`),
-  acts:[{f:()=>{const v=document.querySelector('#vt'); v.style.width='100%'; v.innerHTML=segs(28,100);}},
-        {s:'点顶部 <b>文本 → 智能字幕 → 识别字幕 → 开始识别</b>。时间线上会多出一条字幕轨，软件会把这些台词用于：打标认人名、写文案、精确截原声。'},
-        {c:'#tText'},{c:'#recog',f:()=>{document.querySelector('#subL').textContent='字幕'; const s=document.querySelector('#st'); let k=0; const t=setInterval(()=>{ s.insertAdjacentHTML('beforeend',`<div class="sbox" style="width:${(1.5+Math.random()*3).toFixed(1)}%;flex:none;margin-right:${(Math.random()*1.5).toFixed(1)}%"></div>`); if(++k>30) clearInterval(t); },55); document.querySelector('#screen').textContent='「你凭什么赶我走！」';}},{w:2400},
-        {s:'识别完不用导出，<b>关掉剪映就行</b>（草稿自动保存）。这个草稿就是软件里要选的「场景草稿」。<span class="warn">影视剧可以不识别，改用中文 SRT 文件。</span>'},{w:1500}] },
+  acts:[{f:()=>{document.querySelector('#vt').style.width='100%';}},
+        {s:'原片拖进时间线后，<b>先识别字幕</b>：点顶部 <b>文本 → 智能字幕 → 识别字幕 → 开始识别</b>。<span class="warn">一定要在智能分割之前做，先分割再识别，字幕会断断续续。</span>'},
+        {c:'#tText'},{c:'#recog',f:()=>{document.querySelector('#subL').textContent='字幕'; const s=document.querySelector('#st'); let k=0; const t=setInterval(()=>{ if(!document.body.contains(s)) return clearInterval(t); s.insertAdjacentHTML('beforeend',`<div class="sbox" style="width:${SUBS[k][0].toFixed(1)}%;flex:none;margin-right:${SUBS[k][1].toFixed(1)}%"></div>`); if(++k>=SUBS.length) clearInterval(t); },55); document.querySelector('#screen').textContent='「你凭什么赶我走！」';}},{w:2400},
+        {s:'识别完，时间线上 <b>字幕轨在上、视频在下</b>。软件会用这些台词：打标认人名、写文案、精确截原声。<span class="warn">影视剧可以不识别，改用中文 SRT 文件。</span>'},{w:2200}] },
+
+{ title:'再智能分割：把原片切成一个个镜头', win:'剪映专业版 · 草稿「重生八零」',
+  html: JY(null, '<span>↶</span><span>↷</span><span>✂ 分割</span><span>🗑</span><span id="smart" style="background:#2a2e39;color:#00c8d6">🪄 智能分割</span>'),
+  acts:[{f:()=>{document.querySelector('#vt').style.width='100%'; document.querySelector('#subL').textContent='字幕'; document.querySelector('#st').innerHTML=subBoxes();}},
+        {s:'字幕出来后，选中下面的 <b>视频轨</b>，再用剪映的 <b>智能分割</b>（按镜头自动切开）。软件靠这些切点认识每个镜头：切得越准，画面配得越准。<span class="warn">（按钮位置以你的剪映版本为准）</span>'},
+        {c:'#vt'},{c:'#smart',f:()=>{const v=document.querySelector('#vt'); v.innerHTML=''; let k=0; const t=setInterval(()=>{ if(!document.body.contains(v)) return clearInterval(t); v.insertAdjacentHTML('beforeend',`<div class="seg" style="width:${(2+((k*29)%40)/10).toFixed(1)}%;flex:none"></div>`); if(++k>26) clearInterval(t); },60);}},{w:2200},
+        {s:'分割完不用导出，<b>关掉剪映就行</b>（草稿自动保存）。这个草稿就是软件里要选的「场景草稿」。'},{w:1600}] },
 
 // ---------- 第二部分：软件 ----------
 { grp:'第二部分 · 软件里生成', title:'选原片 + 场景草稿', win:'军哥团队智能匹配软件',
@@ -211,7 +215,7 @@ const SCENES = [
       <div><span style="color:#7d8590;display:inline-block;width:72px">剧情简介</span><span class="fld" id="syn" style="display:inline-block;width:420px" data-ph="选填：主角是谁、遇到了什么事"></span></div>
     </div>
   </div></div>`,
-  acts:[{s:'弹幕解说和传统解说<b>前面的准备完全一样</b>（智能分割 + 识别字幕 / SRT、选原片和场景草稿）。只是在 <b>② 解说设置</b> 里把解说方式换成 <b>💬 弹幕解说</b>。'},
+  acts:[{s:'弹幕解说和传统解说<b>前面的准备完全一样</b>（先识别字幕 / 准备 SRT，再智能分割，然后选原片和场景草稿）。只是在 <b>② 解说设置</b> 里把解说方式换成 <b>💬 弹幕解说</b>。'},
         {c:'#m2',f:()=>{document.querySelector('#m2').classList.add('on'); document.querySelector('#trad').style.display='none'; document.querySelector('#dm').style.display='block';}},
         {s:'选了弹幕解说，<b>写作风格、字数、配音这些会自动隐藏</b>（不配音），换成下面这块黄色设置。'},{w:1600}] },
 
@@ -224,7 +228,7 @@ const SCENES = [
       <div style="margin-bottom:12px"><span style="color:#7d8590;display:inline-block;width:72px">台词字幕</span><span id="hard" style="display:inline-block;width:14px;height:14px;border:1px solid #6e7681;border-radius:3px;vertical-align:-2px;margin-right:6px"></span>原片已有内嵌字幕（不再加）</div>
       <div><span style="color:#7d8590;display:inline-block;width:72px">剧情简介</span><span class="fld" id="syn" style="display:inline-block;width:440px" data-ph="选填：主角是谁、遇到了什么事"></span></div>
     </div></div></div>`,
-  acts:[{s:'<b>素材来源</b>：「整部原片」软件自己找高光；如果你已经把高光片段剪成一条视频，选「<b>我剪好的高光合集</b>」（同样要智能分割 + 识别字幕）。'},{c:'#src1'},
+  acts:[{s:'<b>素材来源</b>：「整部原片」软件自己找高光；如果你已经把高光片段剪成一条视频，选「<b>我剪好的高光合集</b>」（同样要先识别字幕，再智能分割）。'},{c:'#src1'},
         {s:'<b>重组方式</b>：动作、科幻这类高光多的选 <b>高光混剪 + 留悬念</b>（不放结局，勾起观众想看原片）；靠剧情的片子选 <b>完整叙事</b>。<b>成片时长</b> 默认 2 分钟。'},{c:'#st1'},{c:'#len'},
         {s:'短剧画面上自带台词的，勾 <b>原片已有内嵌字幕</b>，就不会再叠一层字幕。<b>剧情简介</b> 选填，填了旁白认人更准（高光合集强烈建议填）。'},
         {c:'#hard',f:()=>{const b=document.querySelector('#hard'); b.style.background='#1f6feb'; b.style.borderColor='#1f6feb';}},
@@ -284,7 +288,7 @@ function buildDm(){
   show(); const t=setInterval(()=>{ if(!show()) clearInterval(t); },1500);
 }
 
-// ===== 播放引擎（同<a href="doubao.html" style="color:#22d3ee">《豆包模型申请教程》</a>） =====
+// ===== 播放引擎（同《豆包模型申请教程》） =====
 const page=document.querySelector('#page'), cursor=document.querySelector('#cursor'), cap=document.querySelector('#caption'), wt=document.querySelector('#wtitle'), stepsEl=document.querySelector('#steps'), bar=document.querySelector('#bar');
 let cur=0, paused=false, token=0;
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
