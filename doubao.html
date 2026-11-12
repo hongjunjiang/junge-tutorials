@@ -2,7 +2,6 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>豆包大模型 API Key 申请教程（动画版）</title>
 <style>
 :root { --bg:#0b1020; --panel:#121a33; --line:#24305a; --text:#e8ecff; --dim:#8a94c0; --blue:#3b6cff; --cyan:#22d3ee; --ok:#22c55e; --warn:#f59e0b; }
@@ -28,7 +27,7 @@ h1 span { background:linear-gradient(90deg,var(--cyan),var(--blue)); -webkit-bac
 .dots i:nth-child(1){background:#ff5f57}.dots i:nth-child(2){background:#febc2e}.dots i:nth-child(3){background:#28c840}
 .url { flex:1; background:#fff; border-radius:8px; padding:6px 12px; font-size:13px; color:#3a4466; font-family:Consolas,monospace; white-space:nowrap; overflow:hidden; }
 .url b { color:#16a34a; font-weight:normal; }
-.page { height:470px; position:relative; color:#1e2340; overflow:hidden; }
+.page { height:520px; position:relative; color:#1e2340; overflow:hidden; }
 .page > .scene { position:absolute; inset:0; animation:fadeIn .45s ease; }
 @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
 /* 鼠标与点击效果 */
@@ -58,6 +57,16 @@ h1 span { background:linear-gradient(90deg,var(--cyan),var(--blue)); -webkit-bac
 .btn.ghost { background:#fff; color:#1f5eff; border:1px solid #1f5eff; }
 .input { border:1px solid #cfd5e6; border-radius:7px; padding:10px 12px; font-size:14px; background:#fff; min-height:40px; color:#1e2340; font-family:Consolas,'Microsoft YaHei',monospace; }
 .input:empty::before { content:attr(data-ph); color:#a0a8c4; }
+/* 火山引擎官网 2026 版元素 */
+.pop { position:absolute; background:#fff; border:1px solid #e3e6ee; border-radius:10px; box-shadow:0 14px 40px rgba(20,30,80,.18); padding:14px 18px; z-index:11; animation:fadeIn .3s; font-size:13px; color:#222; }
+.tg { font-size:11px; background:#f1f2f6; border-radius:4px; padding:1px 6px; color:#555; }
+.ds { color:#8a93a8; font-size:12px; }
+.mi { padding:7px 10px; border-radius:6px; } .mi .ds { margin-top:2px; }
+.nw { font-size:9px; color:#1664ff; border:1px solid #1664ff; border-radius:8px; padding:0 4px; vertical-align:2px; }
+.amt { display:inline-block; width:90px; text-align:center; padding:10px 0; border:2px solid #e3e6ee; border-radius:8px; font-weight:bold; background:#fff; } .amt.on { border-color:#1664ff; background:#eef3ff; color:#1664ff; }
+.tlx { position:relative; padding:0 0 8px 18px; border-left:2px solid #dfe3ee; margin-left:4px; } .tlx .dot { position:absolute; left:-6px; top:4px; width:10px; height:10px; border-radius:50%; background:#c9cfde; }
+.mrow { display:flex; align-items:center; gap:8px; padding:5px 8px; margin-bottom:4px; background:#fff; border:1px solid #e3e6ee; border-radius:6px; }
+.ck { width:16px; height:16px; border:1px solid #c5cad8; border-radius:3px; color:#fff; font-size:11px; display:inline-flex; align-items:center; justify-content:center; }
 .side { position:absolute; left:0; top:54px; bottom:0; width:190px; background:#fff; border-right:1px solid #e6e9f2; padding:12px 8px; font-size:13px; }
 .side div { padding:9px 12px; border-radius:6px; color:#4b5578; }
 .side div.on { background:#eef2ff; color:#1f5eff; font-weight:bold; }
@@ -73,7 +82,6 @@ h1 span { background:linear-gradient(90deg,var(--cyan),var(--blue)); -webkit-bac
 </style>
 </head>
 <body>
-<a href="index.html" style="position:fixed;left:18px;top:14px;color:#8a94c0;font-size:13px;text-decoration:none;border:1px solid #24305a;border-radius:8px;padding:5px 12px;background:#121a33;z-index:99">← 教程首页</a>
 <h1>🫘 <span>豆包大模型 API Key</span> 申请教程</h1>
 <div class="sub">火山引擎 · 火山方舟　｜　自动播放，点左侧步骤可跳转　｜　申请后填进「智能解说 → ③B 模型配置」</div>
 <div class="wrap">
@@ -95,74 +103,72 @@ h1 span { background:linear-gradient(90deg,var(--cyan),var(--blue)); -webkit-bac
   </div>
 </div>
 <div class="tips">
-  <div class="tip"><b>💰 费用</b>新账号通常有免费额度（以控制台显示为准）。用完后在「费用中心」充值，按量计费。打标用 lite 便宜，写文案用 turbo。</div>
+  <div class="tip"><b>💰 费用</b>右上角头像 → 充值汇款，先充几十元就够，按用量扣费，不够再充。打标用 lite 便宜，写文案用 turbo。</div>
   <div class="tip"><b>🔐 Key 要保密</b>API Key 等于账户的钱包钥匙，不要发到群里或截图外传。泄露了就到「API Key 管理」删掉，重新创建一个。</div>
-  <div class="tip"><b>❓ 报错排查</b>提示 401：Key 填错或已删除。提示模型不存在 / 未开通：回到「开通管理」开通对应模型。提示余额不足：去费用中心充值。</div>
+  <div class="tip"><b>❓ 报错排查</b>提示 401：Key 填错或已删除。提示模型不存在 / 未开通：回到模型页「快速接入」里勾选开通 lite 和 turbo。正确的 Key 以 ark 开头。提示余额不足：去费用中心充值。</div>
 </div>
 <script>
 // ===== 场景定义：每步 = 地址栏 + 页面 HTML + 讲解 + 动作序列 =====
 // 动作：{c:选择器} 点击；{t:选择器, v:文字} 打字；{w:毫秒} 等待；{s:讲解} 换讲解；{f:函数} 改页面
-const CONSOLE_TOP = (title) => `<div class="top"><div class="logo"><i></i>火山引擎</div><span style="color:#1e2340;font-weight:bold">${title}</span><span style="margin-left:auto">费用中心</span><span>工单</span><span>👤 我的账号</span></div>`;
-const ARK_SIDE = (on) => `<div class="side">
-  <div class="grp">火山方舟</div><div ${on==='home'?'class="on"':''}>概览</div><div>体验中心</div>
-  <div class="grp">系统管理</div><div id="sOpen" ${on==='open'?'class="on"':''}>开通管理</div><div id="sKey" ${on==='key'?'class="on"':''}>API Key 管理</div>
-  <div class="grp">在线推理</div><div>推理接入点</div><div>用量统计</div></div>`;
-const MODELS = [['Doubao-Seed-2.1-lite','打标（看画面、记台词）','lite'],['Doubao-Seed-2.1-turbo','写文案 / 排片 / 规划','turbo']];
+// ---- 火山引擎官网顶栏（照官网 2026-11 版） ----
+const VE_TOP = (right) => `<div class="top" style="gap:18px;font-size:13px">
+  <div class="logo" style="color:#111"><svg width="22" height="18" viewBox="0 0 22 18"><path d="M0 18 L7 4 L11 11 L13 7 L22 18Z" fill="#1664ff"/><path d="M7 4 L11 11 L9 14Z" fill="#00b2ff"/></svg>火山引擎</div>
+  <span>优惠活动</span><span id="navLlm">大模型</span><span>产品</span><span>解决方案</span><span>定价</span><span>更多</span>
+  <span style="margin-left:auto;border:1px solid #e3e6ee;border-radius:6px;padding:4px 10px;color:#9aa3b8;width:150px">🔍 产品/文档</span>
+  ${right}</div>`;
+const RIGHT_GUEST = `<span>文档</span><span>控制台</span><span>登录</span><span class="btn" id="reg" style="background:#111;padding:6px 16px;border-radius:4px">注册</span>`;
+const RIGHT_USER = `<span>文档</span><span>控制台</span><span id="avatar" style="width:30px;height:30px;border-radius:50%;background:#e8eeff;color:#1664ff;display:flex;align-items:center;justify-content:center;font-weight:bold">9</span><span style="color:#7b6cff">认证享权益</span>`;
+const HERO = `<div style="text-align:center;padding:46px 0 26px"><div style="font-size:40px;letter-spacing:2px;color:#111">火山引擎 你的AI云</div>
+  <div style="color:#8a93a8;font-size:13px;margin:12px 0 20px">模型、工具、应用到云底座，企业 AI 一站构建</div><span class="btn" style="background:#111;border-radius:4px">立即构建</span></div>
+  <div style="display:flex;gap:12px;padding:0 24px">${['企业级 AI Agent 平台','让你的 Agent 善用火山引擎','Seedance 2.5 上新','11.11 AI 智选','Seed Evolving 模型上线'].map((t,i)=>`<div style="flex:1;height:120px;border-radius:8px;padding:10px;display:flex;align-items:flex-end;color:#fff;font-size:12px;background:linear-gradient(135deg,${['#6a8cff,#4b6bff','#7aa2ff,#4f7dff','#1d3c8f,#5c8cff','#8fb0ff,#6b8dff','#1a1446,#4a2fbf'][i]})">${t}</div>`).join('')}</div>`;
+const MODEL_ROWS = [['Doubao-Seed-2.1-lite','打标（看画面、记台词）'],['Doubao-Seed-2.1-turbo','写文案 / 排片 / 规划']];
 
 const SCENES = [
-{ title:'打开火山引擎官网，注册账号', url:'https://<b>www.volcengine.com</b>/',
-  html:`<div class="top"><div class="logo"><i></i>火山引擎</div><span>产品</span><span>解决方案</span><span>定价</span><span>文档</span>
-    <span style="margin-left:auto" id="login">登录</span><span class="btn" id="reg">立即注册</span></div>
-    <div style="padding:70px 60px;background:linear-gradient(120deg,#eaf0ff,#f7fbff 60%)">
-      <div style="font-size:34px;font-weight:bold;color:#14205a">火山方舟 · 大模型服务平台</div>
-      <div style="margin:14px 0 26px;color:#5a648c;font-size:16px">豆包大模型 · 一站式调用 · 按量付费</div>
-      <span class="btn" style="padding:11px 26px">立即体验</span>
-    </div>`,
-  acts:[{s:'浏览器打开 <code>https://www.volcengine.com</code>（火山引擎官网）。已有抖音/字节系账号可以直接<b>登录</b>，没有就点右上角 <b>立即注册</b>。'},{w:900},{c:'#reg'}] },
+{ title:'打开火山引擎官网，点「注册」', url:'https://<b>www.volcengine.com</b>/',
+  html: VE_TOP(RIGHT_GUEST) + HERO,
+  acts:[{s:'浏览器打开 <code>https://www.volcengine.com</code>（火山引擎官网）。点 <b>右上角</b> 黑色的 <b>注册</b> 按钮。已有账号直接点旁边的登录。'},{w:900},{c:'#reg'}] },
 
-{ title:'手机号注册 / 登录', url:'https://<b>console.volcengine.com</b>/auth/signup',
-  html:`<div style="display:flex;height:100%;align-items:center;justify-content:center;background:#eef2fb">
-    <div class="card" style="width:380px;padding:26px">
-      <div style="font-size:20px;font-weight:bold;margin-bottom:18px">注册火山引擎账号</div>
-      <div class="input" id="phone" data-ph="请输入手机号"></div>
-      <div style="display:flex;gap:10px;margin:12px 0"><div class="input" id="code" style="flex:1" data-ph="短信验证码"></div><span class="btn ghost" id="getCode" style="padding:10px 12px">获取验证码</span></div>
-      <div style="font-size:13px;color:#5a648c;margin:6px 0 16px"><span id="agree" style="display:inline-block;width:15px;height:15px;border:1px solid #9aa3c2;border-radius:3px;vertical-align:-2px;margin-right:6px"></span>我已阅读并同意《服务协议》《隐私政策》</div>
-      <div class="btn" id="signup" style="display:block;text-align:center;padding:11px">注 册</div>
-    </div></div>`,
-  acts:[{s:'输入手机号，点 <b>获取验证码</b>，填入短信里的验证码，勾选协议后点 <b>注册</b>。'},{t:'#phone',v:'138 0013 8000'},{c:'#getCode'},{w:500},{t:'#code',v:'246810'},
-        {c:'#agree',f:()=>{const a=document.querySelector('#agree');a.style.background='#1f5eff';a.style.borderColor='#1f5eff';a.innerHTML='<span style="color:#fff;font-size:11px;position:relative;top:-3px;left:2px">✓</span>';}},{c:'#signup'}] },
+{ title:'手机号注册', url:'https://<b>console.volcengine.com</b>/auth/signup',
+  html:`<div style="height:100%;background:#fff;display:flex;justify-content:center;padding-top:34px"><div style="width:420px">
+    <div style="font-size:28px;text-align:center;margin-bottom:22px;color:#111">注册获得免费体验</div>
+    <div style="display:flex;gap:30px;font-size:17px;margin-bottom:22px"><span style="color:#1664ff;border-bottom:3px solid #1664ff;padding-bottom:6px">手机号注册</span><span style="color:#555">账号注册</span></div>
+    <div style="display:flex;border:1px solid #d9dde8;border-radius:6px;margin-bottom:12px"><span style="padding:10px 14px;border-right:1px solid #d9dde8">+86</span><div class="input" id="phone" data-ph="请输入手机号" style="border:none;flex:1"></div></div>
+    <div style="display:flex;gap:10px;margin-bottom:16px"><div class="input" id="code" style="flex:1" data-ph="请输入验证码"></div><span class="btn ghost" id="getCode" style="padding:10px 14px;color:#555;border-color:#d9dde8;background:#f5f6f9">获取验证码</span></div>
+    <div style="font-size:13px;color:#444;margin-bottom:18px"><span id="agree" style="display:inline-block;width:16px;height:16px;border:1px solid #c5cad8;border-radius:3px;vertical-align:-3px;margin-right:8px"></span>点击开始体验代表同意火山引擎 <span style="color:#1664ff">服务条款</span> 和 <span style="color:#1664ff">隐私政策</span></div>
+    <div class="btn" id="signup" style="display:block;text-align:center;padding:11px;background:#8fb4ff">开始体验</div></div></div>`,
+  acts:[{s:'选 <b>手机号注册</b>：输入手机号 → 点 <b>获取验证码</b> → 填短信验证码 → 勾选协议 → 点 <b>开始体验</b>。'},{t:'#phone',v:'138 0013 8000'},{c:'#getCode'},{w:400},{t:'#code',v:'246810'},
+        {c:'#agree',f:()=>{const a=document.querySelector('#agree');a.style.background='#1664ff';a.style.borderColor='#1664ff';a.innerHTML='<span style="color:#fff;font-size:11px;position:relative;top:-3px;left:3px">✓</span>';document.querySelector('#signup').style.background='#1664ff';}},{c:'#signup',f:()=>toast('✅ 注册成功')},{w:800}] },
 
-{ title:'实名认证（必须）', url:'https://<b>console.volcengine.com</b>/user/authentication',
-  html:CONSOLE_TOP('账号中心')+`<div style="padding:30px 40px">
-    <div style="font-size:18px;font-weight:bold;margin-bottom:6px">实名认证</div><div style="color:#7a84a8;font-size:13px;margin-bottom:20px">未实名的账号不能调用模型、不能创建 API Key</div>
-    <div style="display:flex;gap:18px">
-      <div class="card" id="personal" style="flex:1;cursor:pointer"><div style="font-size:16px;font-weight:bold">👤 个人实名认证</div><div style="color:#7a84a8;font-size:13px;margin:8px 0 14px">身份证 + 刷脸，约 1 分钟</div><span class="btn">立即认证</span></div>
-      <div class="card" style="flex:1;opacity:.7"><div style="font-size:16px;font-weight:bold">🏢 企业实名认证</div><div style="color:#7a84a8;font-size:13px;margin:8px 0 14px">营业执照 + 对公打款</div><span class="btn ghost">去认证</span></div>
-    </div>
-    <div id="form" style="display:none;margin-top:20px" class="card">
-      <div style="display:flex;gap:12px"><div class="input" id="name" style="flex:1" data-ph="真实姓名"></div><div class="input" id="idno" style="flex:2" data-ph="身份证号"></div><span class="btn" id="face">手机扫码刷脸</span></div>
-    </div></div>`,
-  acts:[{s:'登录后进入控制台，右上角头像 → <b>账号中心 → 实名认证</b>。个人用户选 <b>个人实名认证</b>，填姓名、身份证号，用手机扫码刷脸即可。'},{c:'#personal',f:()=>{document.querySelector('#form').style.display='block';}},
-        {t:'#name',v:'张*'},{t:'#idno',v:'4403**********1234'},{c:'#face',f:()=>toast('✅ 实名认证成功')},{w:900}] },
+{ title:'右上角头像 → 充值几十元', url:'https://<b>www.volcengine.com</b>/',
+  html: VE_TOP(RIGHT_USER) + HERO,
+  acts:[{s:'注册好回到官网，点 <b>右上角的头像</b>，弹出账号菜单。可以看到「未实名」和 <b>可用余额 ¥0.00</b>。'},{c:'#avatar',f:showUserMenu},{w:1400},
+        {s:'点 <b>充值汇款</b>，<b>充几十元就够了</b>，不够以后再充。打标、写文案都是按用量扣费。'},{c:'#payBtn',f:showPay},{w:600},{c:'#a50',f:()=>document.querySelector('#a50').classList.add('on')},
+        {c:'#doPay',f:()=>{ toast('✅ 充值成功 ¥50.00'); document.querySelector('#payPage').remove(); document.querySelector('#bal').textContent='¥ 50.00'; }},{w:900}] },
 
-{ title:'进入「火山方舟」控制台', url:'https://<b>console.volcengine.com</b>/',
-  html:CONSOLE_TOP('控制台')+`<div style="padding:28px 40px">
-    <div class="input" id="search" style="width:460px" data-ph="🔍 搜索云产品"></div>
-    <div id="result" style="display:none;width:460px;margin-top:6px" class="card"><div id="ark" style="padding:6px 4px;cursor:pointer"><b>火山方舟</b> <span style="color:#7a84a8;font-size:13px">　大模型服务平台（豆包）</span></div></div>
-    <div style="margin-top:26px;color:#7a84a8;font-size:13px">也可以直接访问：console.volcengine.com/ark</div></div>`,
-  acts:[{s:'在控制台顶部搜索 <b>火山方舟</b> 并进入（或直接打开 <code>console.volcengine.com/ark</code>）。豆包模型都在这里。'},{t:'#search',v:'火山方舟'},{f:()=>{document.querySelector('#result').style.display='block';}},{w:400},{c:'#ark'}] },
+{ title:'左上角「大模型」→ 豆包大模型', url:'https://<b>www.volcengine.com</b>/',
+  html: VE_TOP(RIGHT_USER) + HERO,
+  acts:[{s:'接着点 <b>左上角</b> 导航栏的 <b>大模型</b>，在「豆包大模型」这一栏里能看到 <b>2.1 Pro / 2.1 Turbo / 2.1 Lite</b>。我们点 <b>豆包大模型 2.1 Turbo</b>。'},{c:'#navLlm',f:showLlmMenu},{w:1300},{c:'#mTurbo'}] },
 
-{ title:'开通模型：lite + turbo', url:'https://<b>console.volcengine.com</b>/ark/region:cn-beijing/openManagement',
-  html:CONSOLE_TOP('火山方舟')+ARK_SIDE('open')+`<div class="main"><div style="font-size:17px;font-weight:bold;margin-bottom:12px">开通管理 · 语言模型</div><div class="card">
-    ${MODELS.map((m,i)=>`<div class="row"><div><b>${m[0]}</b><div style="color:#7a84a8;font-size:12px;margin-top:3px">软件里用于：${m[1]}</div></div><div><span class="badge off" id="bd${i}">未开通</span>　<span class="btn" id="op${i}" style="padding:6px 14px">开通服务</span></div></div>`).join('')}
-    <div class="row" style="border:none;color:#9aa3c2;font-size:12px">（模型版本号以控制台实际显示为准）</div></div></div>`,
-  acts:[{s:'左侧 <b>系统管理 → 开通管理</b>，找到 <b>Doubao-Seed-2.1-lite</b> 和 <b>Doubao-Seed-2.1-turbo</b>，分别点 <b>开通服务</b>。lite 负责看画面打标，turbo 负责写文案。'},{c:'#sOpen'},
-        {c:'#op0',f:()=>openModel(0)},{w:500},{c:'#op1',f:()=>openModel(1)},{w:900}] },
+{ title:'模型页 → 右上角「快速接入」', url:'https://<b>www.volcengine.com</b>/product/doubao-seed-2-1',
+  html: VE_TOP(RIGHT_USER) + `<div style="display:flex;justify-content:flex-end;gap:8px;padding:10px 24px;font-size:12px;color:#444">
+      <span style="padding:5px 10px">模型性能榜单</span><span style="padding:5px 10px">模型对比</span><span style="padding:5px 10px;border:1px solid #e3e6ee;border-radius:4px">模型单元部署</span>
+      <span id="quick" style="padding:5px 10px;border:1px solid #e3e6ee;border-radius:4px">快速接入</span><span class="btn" style="padding:5px 12px;font-size:12px;background:#4f5bff">立即体验</span></div>
+    <div style="padding:0 60px"><div style="font-size:26px;font-weight:bold;color:#111">Doubao-Seed-2.1系列</div><div style="color:#8a93a8;font-size:12px;margin:8px 0 18px">面向 Coding 和 Agent 时代打造的新一代大模型，提供 pro、turbo 和 lite 三个版本</div>
+      <div style="display:flex;border-bottom:1px solid #e3e6ee">${['pro','turbo','lite'].map(v=>`<div style="padding:12px 30px;font-size:14px;${v==='turbo'?'background:#4f5bff;color:#fff;border-radius:6px 6px 0 0':'color:#333'}">Doubao-Seed-2.1-${v}</div>`).join('')}</div>
+      <div style="display:flex;gap:14px;margin-top:18px"><div class="card" style="flex:1;text-align:center;background:#f5f6f9;border:none"><b>模型价格</b><div style="color:#666;font-size:13px;margin-top:8px">推理输入 <b style="font-size:20px">3</b>　推理输出 <b style="font-size:20px">15</b></div><div style="color:#999;font-size:11px">单位：元/百万tokens</div></div>
+      <div class="card" style="flex:1;text-align:center;background:#f5f6f9;border:none"><b>输入｜输出类型</b><div style="color:#666;font-size:13px;margin-top:12px">文本、图片、视频｜文本</div></div></div></div>`,
+  acts:[{s:'进入 Doubao-Seed-2.1 系列页面后，点 <b>右上角</b> 的 <b>快速接入</b>。'},{w:900},{c:'#quick',f:showQuick}] },
 
-{ title:'创建 API Key 并复制', url:'https://<b>console.volcengine.com</b>/ark/region:cn-beijing/apiKey',
-  html:CONSOLE_TOP('火山方舟')+ARK_SIDE('key')+`<div class="main"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div style="font-size:17px;font-weight:bold">API Key 管理</div><span class="btn" id="create">＋ 创建 API Key</span></div>
-    <div class="card" id="list"><div style="color:#9aa3c2;text-align:center;padding:30px">暂无 API Key</div></div></div>`,
-  acts:[{s:'左侧 <b>API Key 管理</b> → 点 <b>创建 API Key</b>，名字随便填（比如“智能解说”），确定后点 <b>复制</b>。'},{c:'#sKey'},{c:'#create',f:showKeyModal},{t:'#kname',v:'智能解说'},{c:'#kok',f:keyCreated},{w:600},{c:'#copy',f:()=>toast('✅ 已复制到剪贴板')},{w:900}] },
+{ title:'点击创建 → 实名认证', url:'https://<b>www.volcengine.com</b>/product/doubao-seed-2-1',
+  html: VE_TOP(RIGHT_USER) + `<div style="height:100%;background:#f5f6f9"></div>`,
+  acts:[{f:showQuick},{s:'弹出「快捷 API 接入」，选 <b>API 接入</b>。STEP 1 名称保持默认，点 <b>点击创建</b>。'},{w:600},{c:'#qCreate',f:showRealName},
+        {s:'这时会要求先 <b>实名认证</b>：填姓名、身份证号，勾选协议，点 <b>开始扫脸</b>，用手机扫码刷脸。没实名的账号开通不了模型。'},{t:'#rnName',v:'张*'},{t:'#rnId',v:'4403**********1234'},{c:'#rnFace',f:realNameDone},{w:900}] },
+
+{ title:'开通模型，拿到 ark 开头的 API Key', url:'https://<b>www.volcengine.com</b>/product/doubao-seed-2-1',
+  html: VE_TOP(RIGHT_USER) + `<div style="height:100%;background:#f5f6f9"></div>`,
+  acts:[{f:()=>{showQuick(); showRealName(); realNameDone(true);}},
+        {s:'实名后进入 <b>选择模型并开通</b>：把 <b>Doubao-Seed-2.1-lite</b>（打标）和 <b>Doubao-Seed-2.1-turbo</b>（写文案）都勾上开通。'},{c:'#md0',f:()=>tick(0)},{c:'#md1',f:()=>tick(1)},{c:'#mdOpen',f:modelsOpened},{w:700},
+        {s:'开通后就能看到你的 <b>API Key</b>，<b>以 ark 三个字母开头</b>。点 <b>复制</b> 保存好。'},{w:900},{c:'#keyCopy',f:()=>toast('✅ 已复制到剪贴板')},{w:900}] },
 
 { title:'填进软件 ③B 模型配置', url:'军哥团队智能匹配软件 · 智能解说',
   html:`<div style="height:100%;background:#0d1117;color:#e6edf3;padding:22px 30px;font-size:14px">
@@ -174,18 +180,52 @@ const SCENES = [
       <span style="color:#7d8590">写文案模型</span><div class="input sw" id="m2" data-ph="写文案模型" style="background:#21262d;border-color:#30363d;color:#e6edf3"></div>
     </div>
     <div style="margin-top:18px"><span class="btn" id="save">💾 保存配置</span>　<span class="btn ghost" id="test" style="background:transparent">🧪 测试连接</span></div></div>`,
-  acts:[{s:'回到软件「智能解说」页面的 <b>③B 模型配置</b>：地址填 <code>https://ark.cn-beijing.volces.com/api/v3</code>，粘贴 Key，模型保持默认（lite 打标、turbo 写文案），保存后点测试。'},
+  acts:[{s:'回到软件「智能解说」页面的 <b>③B 模型配置</b>：地址填 <code>https://ark.cn-beijing.volces.com/api/v3</code>，粘贴 ark 开头的 Key，模型保持默认（lite 打标、turbo 写文案），保存后点测试。'},
         {t:'#aurl',v:'https://ark.cn-beijing.volces.com/api/v3'},{t:'#akey',v:'ark-••••••••-••••-••••-••••-••••••••',fast:true},
         {t:'#m1',v:'doubao-seed-2-1-lite-260915',fast:true},{t:'#m2',v:'doubao-seed-2-1-turbo-260628',fast:true},{c:'#save',f:()=>toast('✅ 已保存')},{w:600},{c:'#test',f:()=>toast('✅ 连接成功，可以开始使用')},{w:1200},
-        {s:'🎉 完成！以后「智能解说」「弹幕解说」「智能快剪」都会用这个 Key。用量和余额在火山方舟的 <b>用量统计</b> / <b>费用中心</b> 查看。'}] },
+        {s:'🎉 完成！以后「智能解说」「文案粗剪」「弹幕解说」「智能快剪」都会用这个 Key。余额不够了，就在右上角头像 → <b>充值汇款</b> 里再充。'}] },
 ];
 
 // ===== 页面里的小动作 =====
 function toast(msg){ const p=document.querySelector('#page'); const t=document.createElement('div'); t.className='toast'; t.textContent=msg; p.appendChild(t); setTimeout(()=>t.remove(),1600); }
-function openModel(i){ const b=document.querySelector('#bd'+i); b.className='badge'; b.textContent='已开通'; const o=document.querySelector('#op'+i); o.className='btn ghost'; o.textContent='已开通'; toast(`✅ ${MODELS[i][0]} 开通成功`); }
-function showKeyModal(){ const p=document.querySelector('#page'); p.insertAdjacentHTML('beforeend',`<div class="mask" id="mask"></div><div class="modal" id="modal"><div style="font-size:17px;font-weight:bold;margin-bottom:14px">创建 API Key</div><div class="input" id="kname" data-ph="API Key 名称"></div><div style="text-align:right;margin-top:18px"><span class="btn ghost">取消</span>　<span class="btn" id="kok">创建</span></div></div>`); }
-function keyCreated(){ document.querySelector('#mask').remove(); document.querySelector('#modal').remove();
-  document.querySelector('#list').innerHTML=`<div class="row"><div><b>智能解说</b><div style="color:#7a84a8;font-size:12px;margin-top:3px;font-family:Consolas">ark-3f7a••••••••••••••••••••c91e</div></div><div><span class="badge">启用</span>　<span class="btn ghost" id="copy" style="padding:6px 14px">📋 复制</span></div></div>`; toast('✅ 创建成功'); }
+function showUserMenu(){ document.querySelector('#page .scene').insertAdjacentHTML('beforeend',`<div class="pop" style="right:20px;top:58px;width:330px">
+  <div style="font-weight:bold">账号信息 ›</div><div style="margin:6px 0 2px;font-size:13px"><b>9785手机用户#ifsKSL</b> <span class="tg">主账号</span> <span class="tg" style="color:#e07a00">⚠ 未实名 ›</span></div><div style="font-size:12px;color:#888">账号ID：2102312939</div>
+  <div style="border-top:1px solid #eee;margin:10px 0"></div><div style="font-weight:bold">费用中心 ›</div>
+  <div style="background:#f5f6fb;border-radius:8px;padding:10px 12px;margin:8px 0"><div style="display:flex;justify-content:space-between;font-size:13px"><span>¥ 可用余额</span><b style="font-size:16px" id="bal">¥ 0.00</b></div>
+  <div id="payBtn" style="margin-top:8px;border:1px solid #c8ccd8;border-radius:6px;text-align:center;padding:6px;font-size:13px;background:#fff">充值汇款</div></div>
+  <div style="display:flex;justify-content:space-between;font-size:12px;color:#555"><span>账单概览</span><span>账单明细</span><span>费用分析</span><span>发票管理</span></div>
+  <div style="border-top:1px solid #eee;margin:10px 0"></div><div style="font-size:12px;color:#555">开发者与工具：文档中心 · SDK 下载 · API Explorer · API 密钥管理</div></div>`); }
+function showPay(){ document.querySelector('#page .scene').insertAdjacentHTML('beforeend',`<div id="payPage" style="position:absolute;inset:54px 0 0 0;background:#f5f6f9;padding:26px 50px;z-index:12;animation:fadeIn .3s">
+  <div style="font-size:18px;font-weight:bold;margin-bottom:6px">充值汇款</div><div style="color:#8a93a8;font-size:13px;margin-bottom:18px">按量计费，余额用完再充即可</div>
+  <div class="card"><div style="font-size:13px;margin-bottom:10px">充值金额</div><div style="display:flex;gap:12px">${['20','50','100','自定义'].map(v=>`<span class="amt" id="a${v==='自定义'?'c':v}">${v==='自定义'?v:'¥'+v}</span>`).join('')}</div>
+  <div style="margin-top:16px;font-size:13px;color:#555">支付方式：<span class="tg">支付宝</span> <span class="tg">微信</span></div><div style="margin-top:16px"><span class="btn" id="doPay">立即充值</span></div></div></div>`); }
+function showLlmMenu(){ document.querySelector('#page .scene').insertAdjacentHTML('beforeend',`<div class="pop" style="left:0;right:0;top:54px;border-radius:0;padding:16px 80px;display:grid;grid-template-columns:1fr 1fr;gap:4px 60px;font-size:13px">
+  <div><b>AI 统一节省计划 →</b><div class="ds">跨模型抵扣，降低成本</div></div><div><b>AI 体验中心 →</b><div class="ds">豆包大模型2.1全新上线</div></div>
+  <div style="grid-column:1/3;font-size:15px;font-weight:bold;margin-top:10px;border-top:1px solid #eee;padding-top:10px">豆包大模型</div>
+  <div class="mi">豆包大模型 Evolving <span class="nw">HOT</span><div class="ds">Agent 场景效果提升</div></div><div class="mi">豆包视频生成模型2.5 <span class="nw">NEW</span><div class="ds">30 秒超长叙事</div></div>
+  <div class="mi">豆包大模型2.1 Pro <span class="nw">NEW</span><div class="ds">Agent 执行与多模态理解能力全面增强</div></div><div class="mi">豆包视频生成模型2.0<div class="ds">多模态视频创作</div></div>
+  <div class="mi" id="mTurbo">豆包大模型2.1 Turbo <span class="nw">NEW</span><div class="ds">高性价比，规模化应用之选</div></div><div class="mi">豆包图像创作模型5.0<div class="ds">融合实时网络信息</div></div>
+  <div class="mi">豆包大模型2.1 Lite <span class="nw">NEW</span><div class="ds">全新二模态理解模型，支持 1M 上下文</div></div><div class="mi">豆包实时语音模型3.0<div class="ds">真人级别的语音对话</div></div></div>`); }
+function showQuick(){ if(document.querySelector('#quickModal')) return; document.querySelector('#page .scene').insertAdjacentHTML('beforeend',`<div class="mask"></div><div id="quickModal" style="position:absolute;left:50%;top:14px;bottom:14px;transform:translateX(-50%);width:640px;background:#fff;border-radius:10px;z-index:10;padding:16px 20px;overflow:hidden;animation:fadeIn .3s;font-size:13px">
+  <div style="display:flex;font-size:17px;margin-bottom:12px">快捷 API 接入<span style="margin-left:auto">✕</span></div>
+  <div style="display:flex;gap:10px;margin-bottom:10px"><div style="flex:1;border:1.5px solid #333;border-radius:8px;padding:8px 12px"><b>&lt;/&gt; API 接入</b><div class="ds">2 分钟快速接入热门模型</div></div><div style="flex:1;border:1px solid #e3e6ee;border-radius:8px;padding:8px 12px"><b>🖥 Agent 快速配置</b><div class="ds">适配主流 Agent</div></div></div>
+  <div id="qStep1" style="background:#f7f8fb;border-radius:8px;padding:10px 14px;margin-bottom:8px"><div><span style="color:#5b6cff">STEP 1</span>　获取 API KEY</div>
+    <div class="ds" style="margin:6px 0">API Key 是访问火山方舟大模型服务的重要凭证，长期有效，请妥善保管</div>
+    <div style="display:flex;align-items:center;border:1px solid #d9dde8;border-radius:6px;padding:6px 10px;width:380px;background:#fff"><span style="color:#888;width:60px">名称</span>api-key-20261112142222</div>
+    <div style="margin-top:8px"><span class="btn" id="qCreate" style="padding:6px 16px;font-size:13px;background:linear-gradient(90deg,#1664ff,#8a5cf6)">点击创建</span></div></div>
+  <div id="qStep2" style="background:#f7f8fb;border-radius:8px;padding:10px 14px"><span style="color:#5b6cff">STEP 2</span>　快速接入测试 <span style="float:right">›</span></div></div>`); }
+function showRealName(){ document.querySelector('#qStep1').innerHTML='<span style="color:#5b6cff">STEP 1</span>　获取 API KEY <span style="float:right;color:#16a34a">✓ 已创建 ›</span>';
+  document.querySelector('#qStep2').innerHTML=`<div><span style="color:#5b6cff">STEP 2</span>　快速接入测试</div><div class="ds" style="margin:4px 0 8px">选择开通的模型后将为您自动填充信息到代码示例中</div>
+  <div class="tlx"><div class="dot"></div><b>实名认证</b><div class="ds">模型开通前需要实名信息，请先前往实名认证，完成后点击"我已实名"</div>
+    <div id="rnBox"><div class="input" id="rnName" data-ph="请输入姓名" style="width:420px;margin:6px 0;min-height:32px;padding:6px 10px"></div><div class="input" id="rnId" data-ph="请输入身份证号码" style="width:420px;min-height:32px;padding:6px 10px"></div>
+    <div style="margin:6px 0;font-size:12px"><span style="color:#1664ff">☑</span> 我已阅读并同意《火山引擎实名认证服务协议》《火山引擎人脸信息处理规则》</div><span class="btn" id="rnFace" style="padding:5px 14px;font-size:13px;background:linear-gradient(90deg,#1664ff,#8a5cf6)">开始扫脸</span>　<span style="color:#666">更多认证方式 ›</span></div></div>
+  <div class="tlx" id="mdSec"><div class="dot"></div><b>选择模型并开通</b></div><div class="tlx" id="codeSec"><div class="dot"></div><b>复制示例代码</b></div><div class="tlx"><div class="dot"></div><b>管理接入详情</b></div>`; }
+function realNameDone(silent){ document.querySelector('#rnBox').innerHTML='<div style="color:#16a34a;margin:6px 0">✅ 已完成实名认证</div>'; if(!silent) toast('✅ 实名认证成功');
+  document.querySelector('#mdSec').innerHTML=`<div class="dot"></div><b>选择模型并开通</b><div style="margin:6px 0">${MODEL_ROWS.map((m,i)=>`<div class="mrow" id="md${i}"><span class="ck" id="ck${i}"></span><b>${m[0]}</b><span class="ds" style="margin-left:8px">软件里用于：${m[1]}</span></div>`).join('')}<span class="btn" id="mdOpen" style="padding:5px 14px;font-size:13px">开通模型</span></div>`; }
+function tick(i){ const c=document.querySelector('#ck'+i); c.style.background='#1664ff'; c.style.borderColor='#1664ff'; c.textContent='✓'; }
+function modelsOpened(){ toast('✅ 模型开通成功'); document.querySelector('#mdSec').innerHTML='<div class="dot"></div><b>选择模型并开通</b> <span style="color:#16a34a">✓ lite、turbo 已开通</span>';
+  document.querySelector('#codeSec').innerHTML=`<div class="dot"></div><b>复制示例代码</b><div style="margin-top:6px;background:#0f1424;color:#cfe3ff;border-radius:8px;padding:10px 12px;font-family:Consolas,monospace;font-size:12px;line-height:1.7">
+    base_url = "https://ark.cn-beijing.volces.com/api/v3"<br>api_key&nbsp; = "<span id="keyText" style="color:#7ee787;background:#7ee78722;padding:0 4px;border-radius:3px">ark-3f7a9c2e-••••-••••-••••-••••c91e</span>"　<span id="keyCopy" style="background:#1664ff;color:#fff;border-radius:4px;padding:1px 8px;font-family:'Microsoft YaHei'">复制</span><br>model&nbsp;&nbsp;&nbsp; = "doubao-seed-2-1-turbo-260628"</div>`; }
 
 // ===== 播放引擎 =====
 const page=document.querySelector('#page'), cursor=document.querySelector('#cursor'), cap=document.querySelector('#caption'), urlEl=document.querySelector('#url'), stepsEl=document.querySelector('#steps'), bar=document.querySelector('#bar');
